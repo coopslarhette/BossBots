@@ -1,7 +1,7 @@
 package org.firstinspires.ftc.teamcode;
 
 import android.graphics.Path;
-import com.qualcomm.robotcore.*;
+
 import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
@@ -10,7 +10,7 @@ import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
-@TeleOp(name = "Template: Iterative OpMode", group = "Iterative Opmode")
+@TeleOp(name = "MecanumWheel_Stone", group = "Iterative Opmode")
 // @Autonomous(...) is the other common choice
 @Disabled
 
@@ -38,16 +38,20 @@ public class Omniwheel extends OpMode { // Copied from TemplateOpMode_Iterative
         motor2 = hardwareMap.dcMotor.get("motor2");
         motor3 = hardwareMap.dcMotor.get("motor3");
         motor4 = hardwareMap.dcMotor.get("motor4");
+
+        /* Structure of the robot
+                (Front)                 Joystick Positions
+          Motor 4      Motor 3                  -1
+                /-----\                         |
+                 |   |                    -1 ------- 1
+                 |   |                          |
+                \-----/                         1
+          Motor 1     Motor 2
+                (Back)
+        */
         //flywheel1 = hardwareMap.dcMotor.get("flywheel");
         //flywheel2 = hardwareMap.dcMotor.get("flywheel2");
 
-    }
-
-    private void killMotors() {
-        motor1.setPower(0);
-        motor2.setPower(0);
-        motor3.setPower(0);
-        motor4.setPower(0);
     }
 
     /*
@@ -56,10 +60,6 @@ public class Omniwheel extends OpMode { // Copied from TemplateOpMode_Iterative
     @Override
     public void init_loop() {
     }
-
-        /*
-         * Code to run ONCE when the driver hits PLAY
-         */
 
     @Override
     public void start() {
@@ -71,134 +71,54 @@ public class Omniwheel extends OpMode { // Copied from TemplateOpMode_Iterative
      */
     @Override
     public void loop() {
-        motorPower();
-    }
-
-    private void motorPower() { // Basically public void loop(){}
-        killMotors();
-
-        //Move back, forward, left, and right
-
-        while (gamepad1.left_stick_y < 0 && (Math.abs(gamepad1.left_stick_x) <= 0.1)) { //forward
-            motor4.setPower(-Math.abs(gamepad1.left_stick_y));
-            motor1.setPower(-Math.abs(gamepad1.left_stick_y));
-            motor3.setPower(Math.abs(gamepad1.left_stick_y));
-            motor2.setPower(Math.abs(gamepad1.left_stick_y));
-            telemetry.addData("While 1", true);
-        }
-        while (gamepad1.left_stick_y > 0 && (Math.abs(gamepad1.left_stick_x) <= 0.1)) { //backward
-            motor4.setPower(Math.abs(gamepad1.left_stick_y));
-            motor1.setPower(Math.abs(gamepad1.left_stick_y));
-            motor3.setPower(-Math.abs(gamepad1.left_stick_y));
-            motor2.setPower(-Math.abs(gamepad1.left_stick_y));
-            telemetry.addData("While 2", true);
-        }
-        while (gamepad1.left_stick_x < 0 && (Math.abs(gamepad1.left_stick_y) <= 0.1)) { //move left
-            motor1.setPower(-Math.abs(gamepad1.left_stick_x));
-            motor2.setPower(-Math.abs(gamepad1.left_stick_x));
-            motor3.setPower(Math.abs(gamepad1.left_stick_x));
-            motor4.setPower(Math.abs(gamepad1.left_stick_x));
-            telemetry.addData("While 3", true);
-        }
-        while (gamepad1.left_stick_x > 0 && (Math.abs(gamepad1.left_stick_y) <= 0.05)) { //move right
-            motor1.setPower(Math.abs(gamepad1.left_stick_x));
-            motor2.setPower(Math.abs(gamepad1.left_stick_x));
-            motor3.setPower(-Math.abs(gamepad1.left_stick_x));
-            motor4.setPower(-Math.abs(gamepad1.left_stick_x));
-            telemetry.addData("While 4", true);
-        }
-
-/*
-        //Diagonal directions
-        while (gamepad1.left_stick_x > .05 && gamepad1.left_stick_y > .05) { //top right direction
-            motor2.setPower(Math.abs(gamepad1.left_stick_x));
-            motor4.setPower(-Math.abs(gamepad1.left_stick_x));
-        }
-        while (gamepad1.left_stick_x < -.05 && gamepad1.left_stick_y > .05) {  //top left direction
-            motor1.setPower(-Math.abs(gamepad1.left_stick_y));
-            motor3.setPower(Math.abs(gamepad1.left_stick_y));
-        }
-        while (gamepad1.left_stick_x < -.05 && gamepad1.left_stick_y < -.05) {  //bottom left direction
-            motor2.setPower(-Math.abs(gamepad1.left_stick_x));
-            motor4.setPower(Math.abs(gamepad1.left_stick_x));
-            //motor4.setDirection(DcMotorSimple.Direction.REVERSE);
-        }
-        while (gamepad1.left_stick_x > .05 && gamepad1.left_stick_y < -.05) {  //bottom right direction
-            motor3.setPower(-Math.abs(gamepad1.left_stick_x));
-            motor1.setPower(Math.abs(gamepad1.left_stick_x));
-        }
+        double angle = this.getAngle(gamepad1.left_stick_x,gamepad1.left_stick_y);
+        double length = this.getDistance(gamepad1.left_stick_x,gamepad1.left_stick_y);
+        //Different length at the same angle will change the motor powers
+        /*
+            ie. Joystick at 4 unit away from center generates 2 times the power of the joystick 2 units away
         */
-
-        // Turning
-        while (gamepad1.right_stick_x < 0) { //turn left
-            motor4.setPower(Math.abs(gamepad1.right_stick_x));
-            motor1.setPower(Math.abs(gamepad1.right_stick_x));
-            motor3.setPower(Math.abs(gamepad1.right_stick_x));
-            motor2.setPower(Math.abs(gamepad1.right_stick_x));
-        }
-        while (gamepad1.right_stick_x > 0) { //turn right
-            motor4.setPower(-Math.abs(gamepad1.right_stick_x));
-            motor1.setPower(-Math.abs(gamepad1.right_stick_x));
-            motor3.setPower(-Math.abs(gamepad1.right_stick_x));
-            motor2.setPower(-Math.abs(gamepad1.right_stick_x));
-        }
-
-/*
-            // Flywheel
-        if(gamepad1.right_trigger > 0){
-           flywheel1.setPower(gamepad1.right_trigger);
-            flywheel2.setPower(-gamepad1.right_trigger);
-        } else{
-            flywheel1.setPower(0);
-            flywheel2.setPower(0);
-        }
-*/
-        telemetry.addData("Status", "Running: " + runtime.toString());
-        telemetry.addData("Left Stick x: ", gamepad1.left_stick_x);
-        telemetry.addData("Left Stick y: ", gamepad1.left_stick_y);
-        telemetry.addData("Flywheel trigger: ", gamepad1.right_trigger);
-        // driveTrain(gamepad1.left_stick_x,gamepad1.left_stick_y);
-        // Directions not exact
+        motor1.setPower(length*Math.cos(angle-Math.PI/4));
+        motor2.setPower(length*Math.sin(angle-Math.PI/4));
+        motor3.setPower(length*Math.cos(angle-Math.PI/4));
+        motor4.setPower(length*Math.sin(angle-Math.PI/4));
     }
 
-
-    /*
-     * Code to run ONCE after the driver hits STOP
+    /**
+     * Calculate the angle which the joystick is currently at
+     * @param x   the x position of the joystick
+     * @param y   the y position of the joystick
      */
-    @Override
-    public void stop() {
-    }
-    /*
-    public void driveTrain(double x, double y){
-        if (x < 0){ // Left
-            motor1.setPower(1);
-            motor2.setPower(-1);
+    public double getAngle(double x, double y){
+        //First Figure out the Quadrant then find the angle
 
-
-        } else if (x > 0){ // Right
-            motor1.setPower(-1);
-            motor2.setPower(1);
-        } else {
-            motor1.setPower(0);
-            motor2.setPower(0);
+        // First Quadrant
+        if(x>0 && y<0){
+            return Math.atan(-y/x);
         }
 
-        if (y < 0){ // Forward
-            motor3.setPower(-1);
-            motor4.setPower(1);
-
-
-        } else if (y > 0){ // Backwards
-            motor3.setPower(1);
-            motor4.setPower(-1);
-
-
-        } else {
-            motor3.setPower(0);
-            motor4.setPower(0);
+        // Second Quadrant
+        else if(x<0 && y<0){
+            return Math.PI - Math.atan(-y/x);
         }
+
+        // Third Quadrant
+        else if(x<0 && y>0){
+            return 3/2*Math.PI - Math.atan(-y/x);
+        }
+
+        // Fourth Quadrant
+        return 2*Math.PI - Math.atan(-y/x);
     }
-        */
+
+    /**
+     * Calculate the distance from the center to where the joystic is currently at
+     * @param x   the x position of the joystick
+     * @param y   the y position of the joystick
+     */
+    public double getDistance(double x, double y){
+        return Math.sqrt(Math.pow(x,2)+Math.pow(y,2));
+    }
+
 }
 
 
