@@ -70,7 +70,7 @@ public class ConceptRegisterOpModes
     // manager.register("Iterative Opmode",       TemplateOpMode_Iterative.class);
     // manager.register("Linear Opmode",          TemplateOpMode_Linear.class);
     manager.register("Omniwheel",                 Omniwheel.class);
-    manager.register("Run",                 RunBelt.class);
+    manager.register("RunBelt",                   RunBelt.class);
     // Driving Samples
     // manager.register("Teleop POV",             PushbotTeleopPOV_Linear.class);
     // manager.register("Teleop Tank",            PushbotTeleopTank_Iterative.class);

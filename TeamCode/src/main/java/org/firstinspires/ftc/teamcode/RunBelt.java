@@ -42,8 +42,9 @@ import java.util.Date;
 public class RunBelt extends OpMode {
     /* Declare OpMode members. */
     private ElapsedTime runtime = new ElapsedTime();
-    private DcMotor motor1;
-    private Servo sweeper;
+    private DcMotor motor5;
+    private DcMotor motor6;
+   // private Servo sweeper;
 
     // private DcMotor leftMotor = null;
     // private DcMotor rightMotor = null;
@@ -53,8 +54,9 @@ public class RunBelt extends OpMode {
      */
     @Override
     public void init() {
-        motor1 = hardwareMap.dcMotor.get("motor1");
-        sweeper = hardwareMap.servo.get("sweeper");
+        motor5 = hardwareMap.dcMotor.get("motor5");
+        motor6 = hardwareMap.dcMotor.get("motor6");
+       // sweeper = hardwareMap.servo.get("sweeper");
         telemetry.addData("Status", "Initialized");
 
         /* eg: Initialize the hardware variables. Note that the strings used here as parameters
@@ -91,8 +93,8 @@ public class RunBelt extends OpMode {
      */
     @Override
     public void loop() {
-        motor1.setPower(gamepad1.right_trigger);
-        sweeper.setPosition(gamepad1.left_trigger);
+        motor5.setPower(-gamepad1.right_trigger);
+       // sweeper.setPosition(gamepad1.left_trigger);
         telemetry.addData("Status", "Running: " + runtime.toString());
 
         // eg: Run wheels in tank mode (note: The joystick goes negative when pushed forwards)
