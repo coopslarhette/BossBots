@@ -25,8 +25,8 @@ public class Omniwheel extends OpMode { // Copied from TemplateOpMode_Iterative
     private DcMotor motor2;
     private DcMotor motor3;
     private DcMotor motor4;
-    private DcMotor flywheel1;
-    private DcMotor flywheel2;
+    private DcMotor springMotor;
+    private DcMotor bBallMotor;
 
     /*
      * Code to run ONCE when the driver hits INIT
@@ -40,6 +40,8 @@ public class Omniwheel extends OpMode { // Copied from TemplateOpMode_Iterative
         motor3 = hardwareMap.dcMotor.get("motor3");
         motor4 = hardwareMap.dcMotor.get("motor4");
         motor4.setDirection(DcMotorSimple.Direction.REVERSE);
+        //springMotor = hardwareMap.dcMotor.get("springMotor");
+        //bBallMotor = hardwareMap.dcMotor.get("bBallMotor");
 
         /* Structure of the robot
                 (Front)                 Joystick Positions
@@ -83,10 +85,21 @@ public class Omniwheel extends OpMode { // Copied from TemplateOpMode_Iterative
         telemetry.addData("Sin", length * Math.sin(angle - Math.PI / 4));
         telemetry.addData("X", gamepad1.left_stick_x);
         telemetry.addData("Y not negative", gamepad1.left_stick_y);
-        motor1.setPower(length * Math.sin(angle - Math.PI / 4));
-        motor2.setPower(length * Math.cos(angle - Math.PI / 4));
-        motor3.setPower(length * Math.sin(angle - Math.PI / 4));
-        motor4.setPower(length * Math.cos(angle - Math.PI / 4));
+        if (Math.abs(gamepad1.right_stick_x) > .05) {
+            motor1.setPower(gamepad1.right_stick_x);
+            motor2.setPower(-gamepad1.right_stick_x);
+            motor3.setPower(-gamepad1.right_stick_x);
+            motor4.setPower(gamepad1.right_stick_x);
+        } else {
+            motor1.setPower(length * Math.sin(angle - Math.PI / 4));
+            motor2.setPower(length * Math.cos(angle - Math.PI / 4));
+            motor3.setPower(length * Math.sin(angle - Math.PI / 4));
+            motor4.setPower(length * Math.cos(angle - Math.PI / 4));
+        }
+        //bBallMotor.setPower(gamepad1.right_trigger);
+//        while (gamepad1.a) {
+//            springMotor.setPower(1);
+//        }
     }
 
     /**
@@ -97,14 +110,14 @@ public class Omniwheel extends OpMode { // Copied from TemplateOpMode_Iterative
      */
     public double getAngle(double x, double y) {
         //First Figure out the Quadrant then find the angle
-        if(-y>=0){
-            telemetry.addData("y>=0", Math.atan2(-y,x));
+        if (-y >= 0) {
+            telemetry.addData("y>=0", Math.atan2(-y, x));
             telemetry.addData("y<0", false);
-            return Math.atan2(-y,x);
-        } else if(-y<0){
+            return Math.atan2(-y, x);
+        } else if (-y < 0) {
             telemetry.addData("y>=0", false);
-            telemetry.addData("y<0", Math.PI*2-Math.atan2(-y,x));
-            return Math.PI*2-Math.atan2(-y,x);
+            telemetry.addData("y<0", Math.PI * 2 - Math.atan2(-y, x));
+            return Math.PI * 2 - Math.atan2(-y, x);
         }
         return 0;
     }
