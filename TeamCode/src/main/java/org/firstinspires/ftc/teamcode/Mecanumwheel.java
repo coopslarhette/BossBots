@@ -127,9 +127,12 @@ public class Mecanumwheel extends OpMode { // Copied from Omniwheel
             return Math.atan2(-y, x);
         } else if (-y < 0) {
             telemetry.addData("y>=0", false);
-            telemetry.addData("y<0", Math.PI * 2 - Math.atan2(-y, x));
-            return Math.PI * 2 - Math.atan2(-y, x);
-        }
+            telemetry.addData("y<0", Math.PI * 2 + Math.atan2(-y, x));
+            return 2 * Math.PI + Math.atan2(-y, x);
+        } /*
+           * why is this 2pi minus the angle?, ie angle = 3pi /2
+           * 4pi/2 - 3pi/2 = 1pi/2 which is forward direction
+           */
         return 0;
     }
 
