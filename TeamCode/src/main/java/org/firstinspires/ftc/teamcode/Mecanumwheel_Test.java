@@ -15,37 +15,18 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 @Disabled
 
 /*
-
-OBJECTIVE:
-- Covert omni control to mecanum control
-
+ *Tests the different motors on the robot to get them configured correctly
  */
 
-public class Mecanumwheel_Test extends OpMode { // Copied from Omniwheel
+public class Mecanumwheel_Test extends OpMode {
     /* Declare OpMode members. */
     private ElapsedTime runtime = new ElapsedTime();
-
-    // private DcMotor leftMotor = null;
-    // private DcMotor rightMotor = null;
-
     private DcMotor motor1;
     private DcMotor motor2;
     private DcMotor motor3;
     private DcMotor motor4;
-    private DcMotor flywheel1;
-    private DcMotor flywheel2;
-
-    public Mecanumwheel_Test (DcMotor motor1, DcMotor motor2, DcMotor motor3, DcMotor motor4){
-        this.motor1 = motor1;
-        this.motor2 = motor2;
-        this.motor3 = motor3;
-        this.motor4 = motor4;
-        this.flywheel1 = flywheel1;
-        this.flywheel2 = flywheel2;
-
-    }
-
-
+    private DcMotor shooter;
+    private DcMotor lift;
 
     /*
      * Code to run ONCE when the driver hits INIT
@@ -57,8 +38,8 @@ public class Mecanumwheel_Test extends OpMode { // Copied from Omniwheel
         motor2 = hardwareMap.dcMotor.get("motor2");
         motor3 = hardwareMap.dcMotor.get("motor3");
         motor4 = hardwareMap.dcMotor.get("motor4");
-        //flywheel1 = hardwareMap.dcMotor.get("flywheel");
-        //flywheel2 = hardwareMap.dcMotor.get("flywheel2");
+        shooter = hardwareMap.dcMotor.get("shooter");
+        lift = hardwareMap.dcMotor.get("lift");
 
     }
 
@@ -69,9 +50,9 @@ public class Mecanumwheel_Test extends OpMode { // Copied from Omniwheel
     public void init_loop() {
     }
 
-        /*
-         * Code to run ONCE when the driver hits PLAY
-         */
+    /*
+     * Code to run ONCE when the driver hits PLAY
+     */
 
     @Override
     public void start() {
@@ -83,91 +64,26 @@ public class Mecanumwheel_Test extends OpMode { // Copied from Omniwheel
      */
     @Override
     public void loop() {
-    }
-
-    public void motorPower() { // Basically public void loop(){}
         //ROBOT BUTTONS CONTROL
 
-        if(gamepad1.x){
+        if (gamepad1.x) {
             motor1.setPower(1);
-        } else if (gamepad1.y){
+        } else if (gamepad1.y) {
             motor2.setPower(1);
-        } else {
-            motor1.setPower(0);
-            motor2.setPower(0);
-        }
-        if(gamepad1.a){
+        } else if (gamepad1.a) {
             motor3.setPower(1);
-        } else if (gamepad1.b){
+        } else if (gamepad1.b) {
             motor4.setPower(1);
-        } else {
-            motor3.setPower(0);
-            motor4.setPower(0);
         }
+        lift.setPower(gamepad1.left_trigger);
+        shooter.setPower(gamepad1.right_trigger);
 
-        /*if (gamepad1.left_stick_x < 0) {
+        telemetry.addData("Status", "Running: " + runtime.toString());
+        telemetry.addData("Left Stick x: ", gamepad1.left_stick_x);
+        telemetry.addData("Left Stick y: ", gamepad1.left_stick_y);
+        telemetry.addData("Flywheel trigger: ", gamepad1.right_trigger);
+    }
 
-        } else if (gamepad1.left_stick_x > 0) {
-
-        } else {
-            motor1.setPower(0);
-            motor2.setPower(0);
-            motor3.setPower(0);
-            motor4.setPower(0);
-        }
-
-        // Forwards and Backwards
-        if (gamepad1.left_stick_y < 0) {
-            motor4.setPower(-1);
-            motor1.setPower(-1);
-            motor3.setPower(1);
-            motor2.setPower(1);
-        } else if (gamepad1.left_stick_y > 0) {
-            motor4.setPower(1);
-            motor1.setPower(1);
-            motor3.setPower(-1);
-            motor2.setPower(-1);
-        } else {
-            motor1.setPower(0);
-            motor2.setPower(0);
-            motor3.setPower(0);
-            motor4.setPower(0);
-        }
-
-        // Turning
-        if (gamepad1.left_stick_x < 0) { //Right
-            motor4.setPower(-1);
-            motor1.setPower(-1);
-            motor3.setPower(-1);
-            motor2.setPower(-1);
-        } else if (gamepad1.left_stick_x > 0) {
-            motor4.setPower(1);
-            motor1.setPower(1);
-            motor3.setPower(1);
-            motor2.setPower(1);
-        } else {
-            motor1.setPower(0);
-            motor2.setPower(0);
-            motor3.setPower(0);
-            motor4.setPower(0);
-            */
-/*
-            // Flywheel
-        if(gamepad1.right_trigger > 0){
-           flywheel1.setPower(gamepad1.right_trigger);
-            flywheel2.setPower(-gamepad1.right_trigger);
-        } else{
-            flywheel1.setPower(0);
-            flywheel2.setPower(0);
-        }
-*/
-            telemetry.addData("Status", "Running: " + runtime.toString());
-            telemetry.addData("Left Stick x: ",gamepad1.left_stick_x);
-            telemetry.addData("Left Stick y: ", gamepad1.left_stick_y);
-            telemetry.addData("Flywheel trigger: ", gamepad1.right_trigger);
-            // driveTrain(gamepad1.left_stick_x,gamepad1.left_stick_y);
-            // Directions not exact
-        }
 
 
     /*
@@ -176,37 +92,6 @@ public class Mecanumwheel_Test extends OpMode { // Copied from Omniwheel
     @Override
     public void stop() {
     }
-    /*
-    public void driveTrain(double x, double y){
-        if (x < 0){ // Left
-            motor1.setPower(1);
-            motor2.setPower(-1);
-
-
-        } else if (x > 0){ // Right
-            motor1.setPower(-1);
-            motor2.setPower(1);
-        } else {
-            motor1.setPower(0);
-            motor2.setPower(0);
-        }
-
-        if (y < 0){ // Forward
-            motor3.setPower(-1);
-            motor4.setPower(1);
-
-
-        } else if (y > 0){ // Backwards
-            motor3.setPower(1);
-            motor4.setPower(-1);
-
-
-        } else {
-            motor3.setPower(0);
-            motor4.setPower(0);
-        }
-    }
-        */
 }
 
 

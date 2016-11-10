@@ -25,8 +25,8 @@ public class Omniwheel extends OpMode { // Copied from TemplateOpMode_Iterative
     private DcMotor motor2;
     private DcMotor motor3;
     private DcMotor motor4;
-    private DcMotor springMotor;
-    private DcMotor bBallMotor;
+//    private DcMotor springMotor;
+//    private DcMotor bBallMotor;
 
     /*
      * Code to run ONCE when the driver hits INIT

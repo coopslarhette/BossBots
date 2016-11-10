@@ -15,9 +15,25 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 @Disabled
 
 /*
+Drive System to control mecanum wheel robot
 
-OBJECTIVE:
-- Covert omni control to mecanum control
+                     Structure of the robot:
+
+                (Front)                 Joystick Positions
+          Motor 4      Motor 3                 -1
+                /-----\                         |
+                 |   |                    -1 ------- 1
+                 |   |                          |
+                \-----/                         1
+          Motor 1     Motor 2
+                (Back)
+
+        Wheel design from ground
+
+            |\|       |/|
+            |\|       |/|
+            |\|       |/|
+
 
  */
 
@@ -25,36 +41,12 @@ public class Mecanumwheel extends OpMode { // Copied from Omniwheel
     /* Declare OpMode members. */
     private ElapsedTime runtime = new ElapsedTime();
 
-    // private DcMotor leftMotor = null;
-    // private DcMotor rightMotor = null;
-
     private DcMotor motor1;
     private DcMotor motor2;
     private DcMotor motor3;
     private DcMotor motor4;
-    private DcMotor flywheel1;
-    private DcMotor flywheel2;
-
-    public Mecanumwheel(DcMotor motor1, DcMotor motor2, DcMotor motor3, DcMotor motor4) {
-        this.motor1 = motor1;
-        this.motor2 = motor2;
-        this.motor3 = motor3;
-        this.motor4 = motor4;
-        this.flywheel1 = flywheel1;
-        this.flywheel2 = flywheel2;
-
-    }
-
-    /**
-     * Set all motor powers to 0
-     */
-    public void killMotors() {
-        motor1.setPower(0);
-        motor2.setPower(0);
-        motor3.setPower(0);
-        motor4.setPower(0);
-    }
-
+//    private DcMotor flywheel1;
+//    private DcMotor flywheel2;
 
     /*
      * Code to run ONCE when the driver hits INIT
@@ -95,55 +87,61 @@ public class Mecanumwheel extends OpMode { // Copied from Omniwheel
     }
 
     public void motorPower() { // Basically public void loop(){}
-        killMotors();
-        //ROBOT BUTTONS CONTROL
+        double angle = this.getAngle(gamepad1.left_stick_x, gamepad1.left_stick_y);
+        double length = this.getDistance(gamepad1.left_stick_x, gamepad1.left_stick_y);
+        /*
+        Different length at the same angle will change the motor powers
+            ie. Joystick at 4 unit away from center generates 2 times the power of the joystick 2 units away
+        */
 
-        // Forwards and Backwards
-        while (gamepad1.left_stick_y < 0) {
-            motor4.setPower(-1);
-            motor1.setPower(-1);
-            motor3.setPower(1);
-            motor2.setPower(1);
+        if (Math.abs(gamepad1.right_stick_x) > .05) {
+            motor1.setPower(gamepad1.right_stick_x);
+            motor2.setPower(-gamepad1.right_stick_x);
+            motor3.setPower(-gamepad1.right_stick_x);
+            motor4.setPower(gamepad1.right_stick_x);
+        } else {
+            motor1.setPower(length * Math.sin(angle - Math.PI / 4));
+            motor2.setPower(length * Math.cos(angle - Math.PI / 4));
+            motor3.setPower(length * Math.sin(angle - Math.PI / 4));
+            motor4.setPower(length * Math.cos(angle - Math.PI / 4));
         }
 
-        while (gamepad1.left_stick_y > 0) {
-            motor4.setPower(1);
-            motor1.setPower(1);
-            motor3.setPower(-1);
-            motor2.setPower(-1);
-        }
-
-        // Turning
-        while (gamepad1.left_stick_x < 0) { //Right
-            motor4.setPower(-1);
-            motor1.setPower(-1);
-            motor3.setPower(-1);
-            motor2.setPower(-1);
-        }
-        while (gamepad1.left_stick_x > 0) { //Left
-            motor4.setPower(1);
-            motor1.setPower(1);
-            motor3.setPower(1);
-            motor2.setPower(1);
-        }
-/*
-            // Flywheel
-        if(gamepad1.right_trigger > 0){
-           flywheel1.setPower(gamepad1.right_trigger);
-            flywheel2.setPower(-gamepad1.right_trigger);
-        } else{
-            flywheel1.setPower(0);
-            flywheel2.setPower(0);
-        }
-*/
+        telemetry.addData("Cos", length * Math.cos(angle - Math.PI / 4));
+        telemetry.addData("Sin", length * Math.sin(angle - Math.PI / 4));
+        telemetry.addData("X", gamepad1.left_stick_x);
+        telemetry.addData("Y not negative", gamepad1.left_stick_y);
         telemetry.addData("Status", "Running: " + runtime.toString());
-        telemetry.addData("Left Stick x: ", gamepad1.left_stick_x);
-        telemetry.addData("Left Stick y: ", gamepad1.left_stick_y);
-        telemetry.addData("Flywheel trigger: ", gamepad1.right_trigger);
-        // driveTrain(gamepad1.left_stick_x,gamepad1.left_stick_y);
-        // Directions not exact
     }
 
+    /**
+     * Calculate the angle which the joystick is currently at
+     *
+     * @param x the x position of the joystick
+     * @param y the y position of the joystick
+     */
+    public double getAngle(double x, double y) {
+        //First Figure out the Quadrant then find the angle
+        if (-y >= 0) {
+            telemetry.addData("y>=0", Math.atan2(-y, x));
+            telemetry.addData("y<0", false);
+            return Math.atan2(-y, x);
+        } else if (-y < 0) {
+            telemetry.addData("y>=0", false);
+            telemetry.addData("y<0", Math.PI * 2 - Math.atan2(-y, x));
+            return Math.PI * 2 - Math.atan2(-y, x);
+        }
+        return 0;
+    }
+
+    /**
+     * Calculate the distance from the center to where the joystic is currently at
+     *
+     * @param x the x position of the joystick
+     * @param y the y position of the joystick
+     */
+    public double getDistance(double x, double y) {
+        return Math.sqrt(Math.pow(x, 2) + Math.pow(y, 2));
+    }
 
     /*
      * Code to run ONCE after the driver hits STOP
@@ -151,37 +149,6 @@ public class Mecanumwheel extends OpMode { // Copied from Omniwheel
     @Override
     public void stop() {
     }
-    /*
-    public void driveTrain(double x, double y){
-        if (x < 0){ // Left
-            motor1.setPower(1);
-            motor2.setPower(-1);
-
-
-        } else if (x > 0){ // Right
-            motor1.setPower(-1);
-            motor2.setPower(1);
-        } else {
-            motor1.setPower(0);
-            motor2.setPower(0);
-        }
-
-        if (y < 0){ // Forward
-            motor3.setPower(-1);
-            motor4.setPower(1);
-
-
-        } else if (y > 0){ // Backwards
-            motor3.setPower(1);
-            motor4.setPower(-1);
-
-
-        } else {
-            motor3.setPower(0);
-            motor4.setPower(0);
-        }
-    }
-        */
 }
 
 
