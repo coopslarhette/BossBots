@@ -42,7 +42,7 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 
 @TeleOp(name="Team 524 Teleop", group="Iterative Opmode")  // @Autonomous(...) is the other common choice
 @Disabled
-public class TeleopTeam524 extends OpMode
+public class TeleopTeam524 extends MecanumOpMode
 {
     /* Declare OpMode members. */
     private ElapsedTime runtime = new ElapsedTime();
