@@ -31,9 +31,9 @@ motor1  motor2             motor1  motor2
 
  Parameters | Explanation
  --- | ---
- `int gamepad` | which gamepad to use: 1 or 2. Default: 1
- `String side` | Which joystick to use on gamepad: right or left. Default: right
- `DcMotor motor4` | Motor on the top-left corner (refer to diagram above)
- `DcMotor motor3` | Motor on the top-right aorner (refer to diagram above)
- `DcMotor motor2` | Motor on the bottom-right corner (refer to diagram above)
- `DcMotor motor1` | Motor on the bottom-left corner (refer to diagram above)
+ `int gamepad` | which gamepad to use: 1 or 2. Default: 1.
+ `String side` | Which joystick to use on gamepad: right or left. Default: right.
+ `DcMotor motor4` | Motor on the top-left corner (refer to diagram above).
+ `DcMotor motor3` | Motor on the top-right aorner (refer to diagram above).
+ `DcMotor motor2` | Motor on the bottom-right corner (refer to diagram above).
+ `DcMotor motor1` | Motor on the bottom-left corner (refer to diagram above).
