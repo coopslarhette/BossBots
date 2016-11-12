@@ -102,7 +102,7 @@ public class TeleopTeam524 extends MecanumOpMode
     @Override
     public void loop() {
         telemetry.addData("Status", "Running: " + runtime.toString());
-        driveJoystick(motor4,motor3,motor2,motor1);
+        driveOneJoystick(1,"left",motor4,motor3,motor2,motor1);
     }
 
     /*
