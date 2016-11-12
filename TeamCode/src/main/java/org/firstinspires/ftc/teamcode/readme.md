@@ -14,7 +14,7 @@ has only the joystick controls. Will be adding more codes at driving at certain 
 
 * `public void driveJoystick(DcMotor motor4, DcMotor motor3, DcMotor motor2, DcMotor motor1)`
 
-Takes in four motors in a clockwise order starting from the top left corner:
+Takes in four motors in a clockwise order starting from the top-left corner:
 
   *Omni-wheel*             *Mecanum Wheel*
   **[Front]**               **[Front]**
