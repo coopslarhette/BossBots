@@ -23,7 +23,7 @@ motor4  motor3             motor4  motor3
 motor1  motor2             motor1  motor2
 ```
 
-## Joystick Coordinate/ Position
+## Joystick Coordinate/ Position (Hardware Configuration)
 
 ```
 Starting Position
