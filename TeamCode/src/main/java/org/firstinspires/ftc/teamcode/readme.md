@@ -7,7 +7,7 @@ Team 524, The Boss Bot's repository
 ## Contains:
 
 * MecanumOpMode
-An abstract class which contains the code for holometric drive (Mecanum and Omniwheel). Currently
+An abstract class which contains the code for holonomic drive (Mecanum and Omniwheel). Currently
 has only the joystick controls. Will be adding more codes for driving at certain angles.
 
 ## Structure of robot
