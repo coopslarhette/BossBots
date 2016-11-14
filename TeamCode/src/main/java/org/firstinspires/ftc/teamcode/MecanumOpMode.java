@@ -3,7 +3,7 @@ import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
 
 /**
- * Created by stonemao on 11/11/2016.
+ * Created by Stone Mao & Cooper LaRhette
  */
 
 public abstract class MecanumOpMode extends OpMode{
