@@ -73,6 +73,7 @@ public class ConceptRegisterOpModes {
         manager.register("Omniwheel",                 Omniwheel.class);
         manager.register("RunBelt",                   RunBelt.class);
         manager.register("MecanumTest",               Mecanumwheel_Test.class);
+        manager.register("Autonomous",                Autonomous.class);
         // Driving Samples
         // manager.register("Teleop POV",             PushbotTeleopPOV_Linear.class);
         // manager.register("Teleop Tank",            PushbotTeleopTank_Iterative.class);
