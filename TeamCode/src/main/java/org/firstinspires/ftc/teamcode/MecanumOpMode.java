@@ -13,6 +13,11 @@ public abstract class MecanumOpMode extends OpMode{
     public DcMotor motor3;
     public DcMotor motor4;
 
+    /**
+     * Drive the holonomic drivetrain with one joystick
+     * @param gamepad Which gamepad to use: 1 or 2. Default 1
+     * @param side Which joystick to use: "left" or "right." Default "right"
+     */
     public void driveOneJoystick(int gamepad, String side){
         double angle, length;
         switch (gamepad){
@@ -50,9 +55,6 @@ public abstract class MecanumOpMode extends OpMode{
         motor2.setPower(sin24);
         motor3.setPower(cos13);
         motor4.setPower(sin24);
-        telemetry.addData("Sin - motor 4 motor 2", sin24);
-        telemetry.addData("Cos - motor 1 motor 3", cos13);
-
     }
     /**
      * Calculate the angle which the joystick is currently at
