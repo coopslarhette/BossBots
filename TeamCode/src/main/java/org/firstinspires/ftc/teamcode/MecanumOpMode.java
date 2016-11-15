@@ -49,8 +49,10 @@ public abstract class MecanumOpMode extends OpMode{
                 }
                 break;
         }
+        //Calculates the motor power based off of trignometric functions
         double sin24 = length * Math.sin(angle - Math.PI / 4);
         double cos13 = length * Math.cos(angle - Math.PI / 4);
+
         motor1.setPower(cos13);
         motor2.setPower(sin24);
         motor3.setPower(cos13);
