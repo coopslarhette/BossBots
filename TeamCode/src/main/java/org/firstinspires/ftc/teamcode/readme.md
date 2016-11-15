@@ -46,6 +46,14 @@ Example Position
 ```
 
 # API
+* `public DcMotor motor1, motor2, motor3, motor4`
+
+ Variables | Explanation
+ --- | ---
+ `DcMotor motor1` | Bottom left motor (refer to diagram above).
+ `DcMotor motor2` | Bottom right motor (refer to diagram above).
+ `DcMotor motor3` | Top right motor (refer to diagram above).
+ `DcMotor motor4` | Top left motor (refer to diagram above).
 
 * `public void driveOneJoystick(int gamepad, String side, DcMotor motor4, DcMotor motor3, DcMotor motor2, DcMotor motor1)`
  * **Function** Drives the motor according to gamepad1 left or right stick position.
@@ -55,10 +63,7 @@ Example Position
  --- | ---
  `int gamepad` | which gamepad to use: 1 or 2. Default: 1.
  `String side` | Which joystick to use on gamepad: right or left. Default: right.
- `DcMotor motor4` | Motor on the top-left corner (refer to diagram above).
- `DcMotor motor3` | Motor on the top-right corner (refer to diagram above).
- `DcMotor motor2` | Motor on the bottom-right corner (refer to diagram above).
- `DcMotor motor1` | Motor on the bottom-left corner (refer to diagram above).
+
 
 * `public double getJoystickAngle(double x, double y)`
  * **Function** Gets the angle (in radians) which the joystick is at currently relative to the center/resting point. Refer to joystick coordinates above.

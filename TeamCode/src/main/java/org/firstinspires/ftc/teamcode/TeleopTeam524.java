@@ -46,10 +46,6 @@ public class TeleopTeam524 extends MecanumOpMode
 {
     /* Declare OpMode members. */
     private ElapsedTime runtime = new ElapsedTime();
-    private DcMotor motor1;
-    private DcMotor motor2;
-    private DcMotor motor3;
-    private DcMotor motor4;
 
     /*
     *   Motor position
@@ -102,7 +98,7 @@ public class TeleopTeam524 extends MecanumOpMode
     @Override
     public void loop() {
         telemetry.addData("Status", "Running: " + runtime.toString());
-        driveOneJoystick(1,"left",motor4,motor3,motor2,motor1);
+        driveOneJoystick(1,"left");
     }
 
     /*

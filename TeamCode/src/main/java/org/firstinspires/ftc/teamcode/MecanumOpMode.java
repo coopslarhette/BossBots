@@ -7,17 +7,13 @@ import com.qualcomm.robotcore.hardware.DcMotor;
  */
 
 public abstract class MecanumOpMode extends OpMode{
-    /**
-     * Drives the motor on the mechanum frame
-     *
-     * Precondition: motor 1-4 are valid motors, side is either left or right.
-     *
-     * @param motor4 Motor on the top left
-     * @param motor3 Motor on the top right
-     * @param motor2 Motor on the bottom right
-     * @param motor1 Motor on the bottom left
-     */
-    public void driveOneJoystick(int gamepad, String side, DcMotor motor4, DcMotor motor3, DcMotor motor2, DcMotor motor1){
+
+    public DcMotor motor1;
+    public DcMotor motor2;
+    public DcMotor motor3;
+    public DcMotor motor4;
+
+    public void driveOneJoystick(int gamepad, String side){
         double angle, length;
         switch (gamepad){
             case 1:
