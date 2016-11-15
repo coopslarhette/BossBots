@@ -68,11 +68,7 @@ public class ConceptRegisterOpModes {
         // Basic Templates
         // manager.register("Iterative Opmode",       TemplateOpMode_Iterative.class);
         // manager.register("Linear Opmode",          TemplateOpMode_Linear.class);
-        manager.register("MecanumWheel",              Mecanumwheel.class);
         manager.register("Team 524 Teleop",           TeleopTeam524.class);
-        manager.register("Omniwheel",                 Omniwheel.class);
-        manager.register("RunBelt",                   RunBelt.class);
-        manager.register("MecanumTest",               Mecanumwheel_Test.class);
         manager.register("Autonomous",                Autonomous.class);
         // Driving Samples
         // manager.register("Teleop POV",             PushbotTeleopPOV_Linear.class);
