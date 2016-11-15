@@ -48,10 +48,10 @@ public abstract class MecanumOpMode extends OpMode{
                 }
                 break;
         }
-        motor1.setPower(length * Math.sin(angle - Math.PI / 4));
-        motor2.setPower(length * Math.cos(angle - Math.PI / 4));
-        motor3.setPower(length * Math.sin(angle - Math.PI / 4));
-        motor4.setPower(length * Math.cos(angle - Math.PI / 4));
+        motor4.setPower(length * Math.sin(angle - Math.PI / 4));
+        motor1.setPower(length * Math.cos(angle - Math.PI / 4));
+        motor2.setPower(length * Math.sin(angle - Math.PI / 4));
+        motor3.setPower(length * Math.cos(angle - Math.PI / 4));
     }
     /**
      * Calculate the angle which the joystick is currently at
