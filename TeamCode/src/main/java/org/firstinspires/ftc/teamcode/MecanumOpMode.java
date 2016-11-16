@@ -1,4 +1,6 @@
 package org.firstinspires.ftc.teamcode;
+import android.hardware.SensorEventListener;
+
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
 
@@ -6,7 +8,7 @@ import com.qualcomm.robotcore.hardware.DcMotor;
  * Created by Stone Mao & Cooper LaRhette
  */
 
-public abstract class MecanumOpMode extends OpMode{
+public abstract class MecanumOpMode extends OpMode {
 
     public DcMotor motor1;
     public DcMotor motor2;
