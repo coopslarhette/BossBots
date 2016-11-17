@@ -75,6 +75,14 @@ public class TeleopTeam524 extends MecanumOpMode
 
         motor4 = hardwareMap.dcMotor.get("motor4");
         motor4.setDirection(DcMotorSimple.Direction.REVERSE);
+
+        light = hardwareMap.lightSensor.get("light");
+
+        compass = hardwareMap.compassSensor.get("compass");
+
+        color = hardwareMap.colorSensor.get("color");
+
+        teamColor = "r";
     }
 
     /*
@@ -98,7 +106,10 @@ public class TeleopTeam524 extends MecanumOpMode
     @Override
     public void loop() {
         telemetry.addData("Status", "Running: " + runtime.toString());
+        telemetry.addData("Compass", compass.getDirection());
         driveOneJoystick(1,"left");
+
+
     }
 
     /*
