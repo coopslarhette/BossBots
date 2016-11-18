@@ -22,6 +22,9 @@ public abstract class MecanumOpMode extends OpMode implements SensorEventListene
     public DcMotor motor2;
     public DcMotor motor3;
     public DcMotor motor4;
+    public DcMotor sweeper;
+    public DcMotor ball;
+    public DcMotor eightyTwenty;
 
     public Servo buttonPresser;
 
@@ -81,10 +84,24 @@ public abstract class MecanumOpMode extends OpMode implements SensorEventListene
         double sin2and4 = length * Math.sin(angle - Math.PI / 4);
         double cos1and3 = length * Math.cos(angle - Math.PI / 4);
 
-        motor1.setPower(cos1and3);
-        motor2.setPower(sin2and4);
-        motor3.setPower(cos1and3);
-        motor4.setPower(sin2and4);
+        //Driving
+        if (gamepad1.left_stick_x > 0.03) {
+            motor1.setPower(gamepad1.left_stick_x);
+            motor2.setPower(gamepad1.left_stick_x);
+            motor3.setPower(gamepad1.left_stick_x);
+            motor4.setPower(gamepad1.left_stick_x);
+        } else {
+            motor1.setPower(cos1and3);
+            motor2.setPower(sin2and4);
+            motor3.setPower(cos1and3);
+            motor4.setPower(sin2and4);
+        }
+        if (gamepad1.x)
+            ball.setPower(1);
+        else
+            ball.setPower(0);
+        sweeper.setPower(gamepad1.left_trigger);
+        eightyTwenty.setPower(gamepad1.right_trigger);
     }
 
     public void turn(int angle) {
