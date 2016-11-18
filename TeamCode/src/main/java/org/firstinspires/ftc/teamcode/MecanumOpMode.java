@@ -78,13 +78,13 @@ public abstract class MecanumOpMode extends OpMode implements SensorEventListene
                 break;
         }
         //Calculates the motor power based off of trignometric functions
-        double sin24 = length * Math.sin(angle - Math.PI / 4);
-        double cos13 = length * Math.cos(angle - Math.PI / 4);
+        double sin2and4 = length * Math.sin(angle - Math.PI / 4);
+        double cos1and3 = length * Math.cos(angle - Math.PI / 4);
 
-        motor1.setPower(cos13);
-        motor2.setPower(sin24);
-        motor3.setPower(cos13);
-        motor4.setPower(sin24);
+        motor1.setPower(cos1and3);
+        motor2.setPower(sin2and4);
+        motor3.setPower(cos1and3);
+        motor4.setPower(sin2and4);
     }
 
     public void turn(int angle) {
@@ -102,12 +102,8 @@ public abstract class MecanumOpMode extends OpMode implements SensorEventListene
     public double getJoystickAngle(double x, double y) {
         //First Figure out the Quadrant then find the angle
         if (-y >= 0) {
-            //telemetry.addData("y>=0", Math.atan2(-y, x));
-            //telemetry.addData("y<0", false);
             return Math.atan2(-y, x);
         } else if (-y < 0) {
-            //telemetry.addData("y>=0", false);
-            //telemetry.addData("y<0", Math.PI * 2 + Math.atan2(-y, x));
             return 2 * Math.PI + Math.atan2(-y, x);
         }
         return 0;
@@ -141,7 +137,7 @@ public abstract class MecanumOpMode extends OpMode implements SensorEventListene
                 // Move to other beacon
                 buttonPresser.setPosition(1);
             } else {
-                telemetry.addData("Error!!!!","Not any color!!!!!");
+                telemetry.addData("Error!!!!", "Not any color!!!!!");
             }
         } else {
             if (color.red() < color.blue()) {
@@ -149,16 +145,17 @@ public abstract class MecanumOpMode extends OpMode implements SensorEventListene
             } else if (color.red() > color.blue()) {
                 // Move to other beacon
                 buttonPresser.setPosition(1);
-            }
-            else {
-                telemetry.addData("Error!!!!","Not any color!!!!!");
+            } else {
+                telemetry.addData("Error!!!!", "Not any color!!!!!");
             }
         }
     }
+
     public void onAccuracyChanged(Sensor sensor, int accuracy) {
         // Ignoring this for now
 
     }
+
     @Override
     public void onSensorChanged(SensorEvent sensorEvent) {
         compassX = sensorEvent.values[0];
