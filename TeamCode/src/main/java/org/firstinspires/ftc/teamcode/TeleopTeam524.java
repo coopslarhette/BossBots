@@ -32,6 +32,11 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 package org.firstinspires.ftc.teamcode;
 
+import android.app.Activity;
+import android.content.Context;
+import android.hardware.Sensor;
+import android.hardware.SensorManager;
+import android.os.Bundle;
 import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
@@ -78,11 +83,15 @@ public class TeleopTeam524 extends MecanumOpMode
 
         light = hardwareMap.lightSensor.get("light");
 
-        compass = hardwareMap.compassSensor.get("compass");
 
         color = hardwareMap.colorSensor.get("color");
 
         teamColor = "r";
+
+        sensorService = (SensorManager) hardwareMap.appContext.getSystemService(Context.SENSOR_SERVICE);
+        sensorService.registerListener(this,
+                sensorService.getDefaultSensor(Sensor.TYPE_MAGNETIC_FIELD),
+                SensorManager.SENSOR_DELAY_NORMAL);
     }
 
     /*
@@ -106,9 +115,9 @@ public class TeleopTeam524 extends MecanumOpMode
     @Override
     public void loop() {
         telemetry.addData("Status", "Running: " + runtime.toString());
-        telemetry.addData("Compass", compass.getDirection());
         driveOneJoystick(1,"left");
 
+        turn(20);
 
     }
 
@@ -118,5 +127,7 @@ public class TeleopTeam524 extends MecanumOpMode
     @Override
     public void stop() {
     }
+
+
 
 }

@@ -1,6 +1,9 @@
 package org.firstinspires.ftc.teamcode;
 
+import android.hardware.Sensor;
+import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
+import android.hardware.SensorManager;
 
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.hardware.ColorSensor;
@@ -13,7 +16,7 @@ import com.qualcomm.robotcore.hardware.Servo;
  * Created by Stone Mao & Cooper LaRhette
  */
 
-public abstract class MecanumOpMode extends OpMode {
+public abstract class MecanumOpMode extends OpMode implements SensorEventListener {
 
     public DcMotor motor1;
     public DcMotor motor2;
@@ -28,10 +31,14 @@ public abstract class MecanumOpMode extends OpMode {
     public final double whiteLight = 0.1;
     public final double deviation = 0.1;
 
-    public CompassSensor compass;
     public double startingAngle;
 
     public ColorSensor color;
+
+    public SensorManager sensorService;
+    public float compassX;
+    public float compassY;
+    public float compassZ;
 
     /**
      * Drive the holonomic drivetrain with one joystick
@@ -81,18 +88,9 @@ public abstract class MecanumOpMode extends OpMode {
     }
 
     public void turn(int angle) {
-        double currentAngle = compass.getDirection();
-        double angleResult = currentAngle + angle;
-        while (compass.getDirection() != angleResult) {
-            motor4.setPower(1);
-            motor1.setPower(1);
-            motor2.setPower(-1);
-            motor3.setPower(-1);
-        }
-        motor4.setPower(0);
-        motor1.setPower(0);
-        motor2.setPower(0);
-        motor3.setPower(0);
+        telemetry.addData("x", compassX);
+        telemetry.addData("y", compassY);
+        telemetry.addData("z", compassZ);
     }
 
     /**
@@ -156,5 +154,15 @@ public abstract class MecanumOpMode extends OpMode {
                 telemetry.addData("Error!!!!","Not any color!!!!!");
             }
         }
+    }
+    public void onAccuracyChanged(Sensor sensor, int accuracy) {
+        // Ignoring this for now
+
+    }
+    @Override
+    public void onSensorChanged(SensorEvent sensorEvent) {
+        compassX = sensorEvent.values[0];
+        compassY = sensorEvent.values[1];
+        compassZ = sensorEvent.values[2];
     }
 }
