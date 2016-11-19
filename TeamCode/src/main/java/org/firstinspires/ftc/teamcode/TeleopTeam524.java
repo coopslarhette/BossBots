@@ -56,7 +56,7 @@ public class TeleopTeam524 extends MecanumOpMode {
     private DcMotor sweeper;
     private DcMotor eightyTwenty;
 
-    //l
+
     /*
     *   Motor position
     *
@@ -127,7 +127,7 @@ public class TeleopTeam524 extends MecanumOpMode {
         telemetry.addData("y value", gamepad1.left_stick_y);
         telemetry.addData("angle", (getJoystickAngle(gamepad1.left_stick_x, gamepad1.left_stick_y) * 180 / Math.PI));
         if (gamepad1.x)
-            belt.setPower(1);
+            belt.setPower(-1);
         else
             belt.setPower(0);
         sweeper.setPower(gamepad1.left_trigger);

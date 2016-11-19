@@ -41,7 +41,7 @@ public abstract class MecanumOpMode extends OpMode implements SensorEventListene
     private float compassY;
     private float compassZ;
 
-    private void turning() {
+    public void turning() {
         motor1.setPower(-gamepad1.left_stick_x);
         motor2.setPower(gamepad1.left_stick_x);
         motor3.setPower(gamepad1.left_stick_x);
@@ -90,7 +90,7 @@ public abstract class MecanumOpMode extends OpMode implements SensorEventListene
         double cos1and3 = length * Math.round(Math.cos(angle - Math.PI / 4)*10.0)/10.0;
 
         //Driving
-        if (gamepad1.right_stick_x > 0.03) {
+        if (Math.abs(gamepad1.right_stick_x) > 0.03) {
             turning();
         } else {
             motor1.setPower(cos1and3);
