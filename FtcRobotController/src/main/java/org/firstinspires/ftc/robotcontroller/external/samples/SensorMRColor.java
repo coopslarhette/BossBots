@@ -73,6 +73,9 @@ public class SensorMRColor extends LinearOpMode {
     // get a reference to the RelativeLayout so we can change the background
     // color of the Robot Controller app to match the hue detected by the RGB sensor.
     final View relativeLayout = ((Activity) hardwareMap.appContext).findViewById(R.id.RelativeLayout);
+    Activity app=((Activity) hardwareMap.appContext);
+
+
 
     // bPrevState and bCurrState represent the previous and current state of the button.
     boolean bPrevState = false;
