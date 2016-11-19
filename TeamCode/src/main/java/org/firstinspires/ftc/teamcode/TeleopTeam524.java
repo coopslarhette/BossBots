@@ -51,6 +51,10 @@ public class TeleopTeam524 extends MecanumOpMode
 {
     /* Declare OpMode members. */
     private ElapsedTime runtime = new ElapsedTime();
+    public DcMotor belt;
+    public DcMotor sweeper;
+    public DcMotor eightyTwenty;
+
 
     /*
     *   Motor position
@@ -83,6 +87,7 @@ public class TeleopTeam524 extends MecanumOpMode
 
         light = hardwareMap.lightSensor.get("light");
 
+        belt = hardwareMap.dcMotor.get("ball");
 
         color = hardwareMap.colorSensor.get("color");
 
@@ -118,7 +123,12 @@ public class TeleopTeam524 extends MecanumOpMode
         driveOneJoystick(1,"left");
 
         turn(20);
-
+        if (gamepad1.x)
+            belt.setPower(1);
+        else
+            belt.setPower(0);
+        sweeper.setPower(gamepad1.left_trigger);
+        eightyTwenty.setPower(gamepad1.right_trigger);
     }
 
     /*

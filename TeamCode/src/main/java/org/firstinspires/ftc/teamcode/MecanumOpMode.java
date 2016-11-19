@@ -23,7 +23,7 @@ public abstract class MecanumOpMode extends OpMode implements SensorEventListene
     public DcMotor motor3;
     public DcMotor motor4;
     public DcMotor sweeper;
-    public DcMotor ball;
+
     public DcMotor eightyTwenty;
 
     public Servo buttonPresser;
@@ -42,6 +42,13 @@ public abstract class MecanumOpMode extends OpMode implements SensorEventListene
     public float compassX;
     public float compassY;
     public float compassZ;
+
+    public void turning() {
+        motor1.setPower(-gamepad1.left_stick_x);
+        motor2.setPower(gamepad1.left_stick_x);
+        motor3.setPower(gamepad1.left_stick_x);
+        motor4.setPower(-gamepad1.left_stick_x);
+    }
 
     /**
      * Drive the holonomic drivetrain with one joystick
@@ -86,22 +93,14 @@ public abstract class MecanumOpMode extends OpMode implements SensorEventListene
 
         //Driving
         if (gamepad1.left_stick_x > 0.03) {
-            motor1.setPower(gamepad1.left_stick_x);
-            motor2.setPower(gamepad1.left_stick_x);
-            motor3.setPower(gamepad1.left_stick_x);
-            motor4.setPower(gamepad1.left_stick_x);
+            turning();
         } else {
             motor1.setPower(cos1and3);
             motor2.setPower(sin2and4);
             motor3.setPower(cos1and3);
             motor4.setPower(sin2and4);
         }
-        if (gamepad1.x)
-            ball.setPower(1);
-        else
-            ball.setPower(0);
-        sweeper.setPower(gamepad1.left_trigger);
-        eightyTwenty.setPower(gamepad1.right_trigger);
+
     }
 
     public void turn(int angle) {
