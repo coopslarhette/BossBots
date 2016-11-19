@@ -22,28 +22,26 @@ public abstract class MecanumOpMode extends OpMode implements SensorEventListene
     public DcMotor motor2;
     public DcMotor motor3;
     public DcMotor motor4;
-    public DcMotor sweeper;
 
-    public DcMotor eightyTwenty;
 
-    public Servo buttonPresser;
+    private Servo buttonPresser;
 
     public String teamColor;
 
     public LightSensor light;
-    public final double whiteLight = 0.1;
-    public final double deviation = 0.1;
+    private final double whiteLight = 0.1;
+    private final double deviation = 0.1;
 
-    public double startingAngle;
+    //public double startingAngle;
 
     public ColorSensor color;
 
     public SensorManager sensorService;
-    public float compassX;
-    public float compassY;
-    public float compassZ;
+    private float compassX;
+    private float compassY;
+    private float compassZ;
 
-    public void turning() {
+    private void turning() {
         motor1.setPower(-gamepad1.left_stick_x);
         motor2.setPower(gamepad1.left_stick_x);
         motor3.setPower(gamepad1.left_stick_x);
@@ -115,7 +113,7 @@ public abstract class MecanumOpMode extends OpMode implements SensorEventListene
      * @param x the x position of the joystick
      * @param y the y position of the joystick
      */
-    public double getJoystickAngle(double x, double y) {
+    private double getJoystickAngle(double x, double y) {
         //First Figure out the Quadrant then find the angle
         if (-y >= 0) {
             return Math.atan2(-y, x);
@@ -131,7 +129,7 @@ public abstract class MecanumOpMode extends OpMode implements SensorEventListene
      * @param x the x position of the joystick
      * @param y the y position of the joystick
      */
-    public double getDistance(double x, double y) {
+    private double getDistance(double x, double y) {
         return Math.sqrt(Math.pow(x, 2) + Math.pow(y, 2));
     }
 

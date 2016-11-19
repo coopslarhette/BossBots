@@ -51,9 +51,9 @@ public class TeleopTeam524 extends MecanumOpMode
 {
     /* Declare OpMode members. */
     private ElapsedTime runtime = new ElapsedTime();
-    public DcMotor belt;
-    public DcMotor sweeper;
-    public DcMotor eightyTwenty;
+    private DcMotor belt;
+    private DcMotor sweeper;
+    private DcMotor eightyTwenty;
 
 
     /*
@@ -77,18 +77,19 @@ public class TeleopTeam524 extends MecanumOpMode
 
         motor1 = hardwareMap.dcMotor.get("motor1");
         motor1.setDirection(DcMotorSimple.Direction.REVERSE);
-
         motor2 = hardwareMap.dcMotor.get("motor2");
-
         motor3 = hardwareMap.dcMotor.get("motor3");
-
         motor4 = hardwareMap.dcMotor.get("motor4");
         motor4.setDirection(DcMotorSimple.Direction.REVERSE);
 
         light = hardwareMap.lightSensor.get("light");
 
-        belt = hardwareMap.dcMotor.get("ball");
+        belt = hardwareMap.dcMotor.get("belt");
 
+        sweeper = hardwareMap.dcMotor.get("sweeper");
+
+        eightyTwenty = hardwareMap.dcMotor.get("eightytwenty");
+        
         color = hardwareMap.colorSensor.get("color");
 
         teamColor = "r";
@@ -124,7 +125,7 @@ public class TeleopTeam524 extends MecanumOpMode
 
         turn(20);
         if (gamepad1.x)
-            belt.setPower(1);
+            belt.setPower(-1);
         else
             belt.setPower(0);
         sweeper.setPower(gamepad1.left_trigger);
