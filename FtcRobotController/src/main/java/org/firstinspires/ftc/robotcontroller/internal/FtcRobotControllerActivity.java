@@ -53,6 +53,11 @@ import android.webkit.WebView;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+import android.app.Activity;
+import android.hardware.Sensor;
+import android.hardware.SensorEvent;
+import android.hardware.SensorEventListener;
+import android.hardware.SensorManager;
 
 import com.google.blocks.ftcrobotcontroller.BlocksActivity;
 import com.google.blocks.ftcrobotcontroller.ProgrammingModeActivity;
@@ -95,10 +100,13 @@ import java.io.File;
 import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
-public class FtcRobotControllerActivity extends Activity {
+public class FtcRobotControllerActivity extends Activity implements SensorEventListener {
 
   public static final String TAG = "RCActivity";
-
+  public SensorManager sensorManager;
+  public float magX;
+  public float magY;
+  public float magZ;
   private static final int REQUEST_CONFIG_WIFI_CHANNEL = 1;
   private static final boolean USE_DEVICE_EMULATION = false;
   private static final int NUM_GAMEPADS = 2;
@@ -193,6 +201,8 @@ public class FtcRobotControllerActivity extends Activity {
 
   @Override
   protected void onCreate(Bundle savedInstanceState) {
+
+
     super.onCreate(savedInstanceState);
     RobotLog.writeLogcatToDisk();
     RobotLog.vv(TAG, "onCreate()");
@@ -237,6 +247,11 @@ public class FtcRobotControllerActivity extends Activity {
     immersion = new ImmersiveMode(getWindow().getDecorView());
     dimmer = new Dimmer(this);
     dimmer.longBright();
+      //Compass
+      sensorManager = (SensorManager) getSystemService(SENSOR_SERVICE);
+      sensorManager.registerListener(this,
+              sensorManager.getDefaultSensor(Sensor.TYPE_MAGNETIC_FIELD),
+              SensorManager.SENSOR_DELAY_NORMAL);
 
     programmingModeController = new ProgrammingModeControllerImpl(
         this, (TextView) findViewById(R.id.textRemoteProgrammingMode));
@@ -294,12 +309,16 @@ public class FtcRobotControllerActivity extends Activity {
   @Override
   protected void onResume() {
     super.onResume();
+     sensorManager.registerListener(this,
+        sensorManager.getDefaultSensor(Sensor.TYPE_MAGNETIC_FIELD),
+        SensorManager.SENSOR_DELAY_NORMAL);
     RobotLog.vv(TAG, "onResume()");
     readNetworkType(NETWORK_TYPE_FILENAME);
   }
 
   @Override
   public void onPause() {
+    sensorManager.unregisterListener(this);
     super.onPause();
     RobotLog.vv(TAG, "onPause()");
     if (programmingModeController.isActive()) {
@@ -311,6 +330,7 @@ public class FtcRobotControllerActivity extends Activity {
   protected void onStop() {
     // Note: this gets called even when the configuration editor is launched. That is, it gets
     // called surprisingly often.
+    sensorManager.unregisterListener(this);
     super.onStop();
     RobotLog.vv(TAG, "onStop()");
 
@@ -527,4 +547,16 @@ public class FtcRobotControllerActivity extends Activity {
       });
     }
   }
+
+  public void onAccuracyChanged(Sensor sensor, int accuracy) {
+    // Ignoring this for now
+
+  }
+  @Override
+  public void onSensorChanged(SensorEvent sensorEvent) {
+      magX = sensorEvent.values[0];
+      magY = sensorEvent.values[1];
+      magZ = sensorEvent.values[2];
+  }
+
 }
