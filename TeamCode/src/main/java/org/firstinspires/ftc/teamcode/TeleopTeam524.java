@@ -122,10 +122,11 @@ public class TeleopTeam524 extends MecanumOpMode
     public void loop() {
         telemetry.addData("Status", "Running: " + runtime.toString());
         driveOneJoystick(1,"left");
-
-        turn(20);
+        telemetry.addData("x value" , gamepad1.left_stick_x);
+        telemetry.addData("y value" , gamepad1.left_stick_y);
+        telemetry.addData("angle" , (getJoystickAngle(gamepad1.left_stick_x, gamepad1.left_stick_y) * 180/Math.PI));
         if (gamepad1.x)
-            belt.setPower(-1);
+            belt.setPower(1);
         else
             belt.setPower(0);
         sweeper.setPower(gamepad1.left_trigger);

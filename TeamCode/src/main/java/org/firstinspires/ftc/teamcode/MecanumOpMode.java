@@ -86,11 +86,11 @@ public abstract class MecanumOpMode extends OpMode implements SensorEventListene
                 break;
         }
         //Calculates the motor power based off of trignometric functions
-        double sin2and4 = length * Math.sin(angle - Math.PI / 4);
-        double cos1and3 = length * Math.cos(angle - Math.PI / 4);
+        double sin2and4 = length * Math.round(Math.sin(angle - Math.PI / 4)*10.0)/10.0;
+        double cos1and3 = length * Math.round(Math.cos(angle - Math.PI / 4)*10.0)/10.0;
 
         //Driving
-        if (gamepad1.left_stick_x > 0.03) {
+        if (gamepad1.right_stick_x > 0.03) {
             turning();
         } else {
             motor1.setPower(cos1and3);
@@ -99,12 +99,18 @@ public abstract class MecanumOpMode extends OpMode implements SensorEventListene
             motor4.setPower(sin2and4);
         }
 
+        telemetry.addData("sin", sin2and4);
+        telemetry.addData("cos", cos1and3);
+
     }
 
     public void turn(int angle) {
-        telemetry.addData("x", compassX);
-        telemetry.addData("y", compassY);
-        telemetry.addData("z", compassZ);
+//        telemetry.addData("x", compassX);
+//        telemetry.addData("y", compassY);
+//        telemetry.addData("z", compassZ);
+
+
+
     }
 
     /**
@@ -113,7 +119,7 @@ public abstract class MecanumOpMode extends OpMode implements SensorEventListene
      * @param x the x position of the joystick
      * @param y the y position of the joystick
      */
-    private double getJoystickAngle(double x, double y) {
+    public double getJoystickAngle(double x, double y) {
         //First Figure out the Quadrant then find the angle
         if (-y >= 0) {
             return Math.atan2(-y, x);
@@ -129,7 +135,7 @@ public abstract class MecanumOpMode extends OpMode implements SensorEventListene
      * @param x the x position of the joystick
      * @param y the y position of the joystick
      */
-    private double getDistance(double x, double y) {
+    public double getDistance(double x, double y) {
         return Math.sqrt(Math.pow(x, 2) + Math.pow(y, 2));
     }
 
