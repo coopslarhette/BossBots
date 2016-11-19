@@ -52,8 +52,8 @@ public class TeleopTeam524 extends MecanumOpMode
     /* Declare OpMode members. */
     private ElapsedTime runtime = new ElapsedTime();
     private DcMotor belt;
-    private DcMotor sweeper;
     private DcMotor eightyTwenty;
+    private DcMotor sweeper;
 
 
     /*
