@@ -37,6 +37,7 @@ import android.content.Context;
 import android.hardware.Sensor;
 import android.hardware.SensorManager;
 import android.os.Bundle;
+
 import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
@@ -45,10 +46,10 @@ import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 
-@TeleOp(name="Team 524 Teleop", group="Iterative Opmode")  // @Autonomous(...) is the other common choice
+@TeleOp(name = "Team 524 Teleop", group = "Iterative Opmode")
+// @Autonomous(...) is the other common choice
 @Disabled
-public class TeleopTeam524 extends MecanumOpMode
-{
+public class TeleopTeam524 extends MecanumOpMode {
     /* Declare OpMode members. */
     private ElapsedTime runtime = new ElapsedTime();
     private DcMotor belt;
@@ -89,7 +90,7 @@ public class TeleopTeam524 extends MecanumOpMode
         sweeper = hardwareMap.dcMotor.get("sweeper");
 
         eightyTwenty = hardwareMap.dcMotor.get("eightytwenty");
-        
+
         color = hardwareMap.colorSensor.get("color");
 
         teamColor = "r";
@@ -121,16 +122,20 @@ public class TeleopTeam524 extends MecanumOpMode
     @Override
     public void loop() {
         telemetry.addData("Status", "Running: " + runtime.toString());
-        driveOneJoystick(1,"left");
-        telemetry.addData("x value" , gamepad1.left_stick_x);
-        telemetry.addData("y value" , gamepad1.left_stick_y);
-        telemetry.addData("angle" , (getJoystickAngle(gamepad1.left_stick_x, gamepad1.left_stick_y) * 180/Math.PI));
+        driveOneJoystick(1, "left");
+        telemetry.addData("x value", gamepad1.left_stick_x);
+        telemetry.addData("y value", gamepad1.left_stick_y);
+        telemetry.addData("angle", (getJoystickAngle(gamepad1.left_stick_x, gamepad1.left_stick_y) * 180 / Math.PI));
         if (gamepad1.x)
             belt.setPower(1);
         else
             belt.setPower(0);
         sweeper.setPower(gamepad1.left_trigger);
-        eightyTwenty.setPower(gamepad1.right_trigger);
+        if (gamepad1.right_bumper) {
+            eightyTwenty.setPower(gamepad1.right_trigger);
+        } else {
+            eightyTwenty.setPower(-gamepad1.right_trigger / 2);
+        }
     }
 
     /*
@@ -139,7 +144,6 @@ public class TeleopTeam524 extends MecanumOpMode
     @Override
     public void stop() {
     }
-
 
 
 }
