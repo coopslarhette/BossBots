@@ -35,6 +35,7 @@ package org.firstinspires.ftc.teamcode;
 import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
+import com.qualcomm.robotcore.hardware.ColorSensor;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.util.ElapsedTime;
@@ -44,6 +45,7 @@ import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
+import android.util.StringBuilderPrinter;
 
 /**
  * This file contains an minimal example of a Linear "OpMode". An OpMode is a 'program' that runs in either
@@ -73,6 +75,7 @@ public class Autonomous extends LinearOpMode implements SensorEventListener{
     public SensorManager sensorService;
     private Sensor magnetometer;
     private Sensor accelerometer;
+    public ColorSensor color;
     public float compassX;
     public float compassY;
     public float compassZ;
@@ -81,10 +84,11 @@ public class Autonomous extends LinearOpMode implements SensorEventListener{
     public float accZ;
 
     // NEEDED FOR PID
-    private double setx, sety, seth; //set points for x, y and theta
+    private double[] setx, sety; //set points for x, y and theta
+    private double seth; //set points for x, y and theta
     private double lerrx, lerry, lerth; //last errors in x, y and theta
     private double errx, erry, erth; //errors in x, y and theta
-    private double curx, cury, cuth; //current x, y and theta from IMU
+    private double curx, cury, cuth; //current x, y and theta from IMU (pun on cury!)
     private double outx, outy, outh; //the output velocity values for x, y and theta
     private double derx, dery, dert; //derivatives of x, y and t(heta)
     //private double ierx, iery, iert; //integrals of x, y and t(heta) (not needed)
@@ -98,16 +102,25 @@ public class Autonomous extends LinearOpMode implements SensorEventListener{
     private double[] ccw; //the vector to take me counterclockwise
     private double[] resultant; //the resultant vector
 
-    private double[] B;
-    private double[] g;
-    private double[] c;
+    private double[] b; //initial magnetic field vector
+    private double[] bprime; //projection of magnetic field on the plane perpendicular to the gravitational field vector
+    private double[][] matrixT; //transformation matrix that takes in vectors in the gamefield reference frame and outputs vectors in the phone reference frame
+    private double[] g; // initial gravitational accl vector
+    private double[] c; // I don't know what this is.
+    private double[] gprime; //unit vector in the direction of g
+    private double[] x; //cross product of y and g
+    private double[] y; // unit vector in the direction of bprime
+    private double[] h; //runtime acceleration vector with gravity
+    private double[] a; //runtime acceleration vector withOUT gravity
+    private double[] s; //runtime displacement vector
+    private double[] bcurr; //runtime magnetic field vector (pun!)
+    private double[] setxT; //x setpoint in phone coordinate system
+    private double[] setyT; //y setpoint in phone coordinate system
+    private String teamColor;
 
     @Override
     public void runOpMode() {
-        telemetry.addData("Status", "Initialized");
-        telemetry.update();
-
-        // Initialize
+        // Initialize Motor
         motor1 = hardwareMap.dcMotor.get("motor1");
         motor1.setDirection(DcMotorSimple.Direction.REVERSE);
 
@@ -118,39 +131,90 @@ public class Autonomous extends LinearOpMode implements SensorEventListener{
         motor4 = hardwareMap.dcMotor.get("motor4");
         motor4.setDirection(DcMotorSimple.Direction.REVERSE);
 
+        //Initialize sensor service
         sensorService = (SensorManager) hardwareMap.appContext.getSystemService(Context.SENSOR_SERVICE);
         //Magnetometer initialization
         magnetometer = sensorService.getDefaultSensor(Sensor.TYPE_MAGNETIC_FIELD);
         //Accelerometer initialization
         accelerometer = sensorService.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
-
+        //Color
+        color = hardwareMap.colorSensor.get("color");
+        //Adds both the sensors to the sensorService
         sensorService.registerListener(this, accelerometer, SensorManager.SENSOR_DELAY_FASTEST);
         sensorService.registerListener(this, magnetometer, SensorManager.SENSOR_DELAY_FASTEST);
 
         //x,y,z
-        B = new double[3];
+        b = new double[3];
         g = new double[3];
         c = new double[3];
+        h = new double[3];
+        a = new double[3];
+        gprime = new double[3];
+        bcurr = new double[3];
+        setxT = new double[3];
+        setyT = new double[3];
+        setx = new double[3];
+        sety = new double[3];
+        //Stores all acceleration of the phone
+        g[0] = accX;
+        g[1] = accY;
+        g[2] = accZ;
+        //Stores all unit vector value
+        b[0] = compassX;
+        b[1] = compassY;
+        b[2] = compassZ;
+        bprime=new  double[3];
+        gprime=new  double[3];
+        x = new  double[3];
+        y = new  double[3];
+        s = new  double[3];
+        matrixT = new double[3][3];
+        for (int i=0; i <= 2; i++) {
+            gprime[i] = (euclidianNorm(g[i], g[0], g[1], g[2]));
+        }
+
+        for (int i = 0; i <= 2; i++) {
+            bprime[i] = (b[i] - (b[i]*euclidianNorm((g[i]*b[i]), g[0], g[1], g[2])));
+        }
+
+        for (int i = 0; i <=2; i++) {
+            y[i] = (euclidianNorm(bprime[i], bprime[0], bprime[1], bprime[2]));
+        }
+
+        x[0] = (y[1]*gprime[2]) - (y[2]*gprime[1]);
+        x[1] = (y[0]*gprime[2]) - (y[2]*gprime[0]);
+        x[1] = (y[0]*gprime[1]) - (y[1]*gprime[0]);
+
+        for(int i = 0; i<3; i++){
+            matrixT[i][0] = x[i];
+            matrixT[i][1] = y[i];
+            matrixT[i][2] = gprime[i];
+        }
+
+        //this should be runtime stuff
+        h[0] = accX;
+        h[1] = accY;
+        h[2] = accZ;
+
+        for (int i = 0; i <= 2; i++) {
+            a[i] = h[i] - g[i];
+        }
+
 
         waitForStart();
         runtime.reset();
         while(opModeIsActive()){
-            telemetry.addData("B", "x: "+B[0]+" y: "+B[1]+" z: "+B[2]);
             telemetry.addData("Accelerometer", "x: "+accX+" y: "+accY+" z: "+accZ);
+            telemetry.addData("Magnetic/Compass", "x: "+compassX+" y: "+compassY+" z: "+compassZ);
         }
 
     }
-    public double[] resultant(double mySetx, double mySety, double mySeth) {
+    public double[] resultant(double[] mySetx, double[] mySety, double mySeth) {
         setx = mySetx;
         sety = mySety;
         seth = mySeth;
 
-
-        //get current variables from sensors
-        //curx = ;
-        //cury =;
-        //cuth =;
-
+        setxT[0] = matrixT[0][0]* ;
 
         //errors in the robot's state are calculated as (setpoint-current)
         errx = setx - curx;
@@ -226,9 +290,36 @@ public class Autonomous extends LinearOpMode implements SensorEventListener{
 
     }
 
+    //this is a mosnomer; you actually get a unit vector out of this
+    public double euclidianNorm(double numerator, double a, double b, double c){
+        return numerator/Math.sqrt(Math.pow(a,2)+Math.pow(b,2)+Math.pow(c,2));
+    }
+
     public void onAccuracyChanged(Sensor sensor, int accuracy) {
         // Ignoring this for now
 
+    }
+    public void rightColor() {
+        //Red > blue --> red
+        if (teamColor.equalsIgnoreCase("r")) {
+            if (color.red() > color.blue()) {
+                telemetry.addData("Color", "Red - YAY!!!");
+            } else if (color.red() < color.blue()) {
+                // Move to other beacon
+                telemetry.addData("Color", "Blue");
+            } else {
+                telemetry.addData("Color", "Not any color!!!!!");
+            }
+        } else {
+            if (color.red() < color.blue()) {
+                telemetry.addData("Color", "Blue - YAY!!!");
+            } else if (color.red() > color.blue()) {
+                // Move to other beacon
+                telemetry.addData("Color", "Red");
+            } else {
+                telemetry.addData("Color", "Not any color!!!!!");
+            }
+        }
     }
     @Override
     public void onSensorChanged(SensorEvent sensorEvent) {
@@ -244,10 +335,32 @@ public class Autonomous extends LinearOpMode implements SensorEventListener{
                 compassZ = sensorEvent.values[2];
                 break;
         }
+        h[0] = accX;
+        h[1] = accY;
+        h[2] = accZ;
 
-        // 0 - X, 1 - Y, 2 - Z
-        B[0]=compassX;
-        B[1]=compassY;
-        B[2]=compassZ;
+        for (int i = 0; i <= 2; i++) {
+            a[i] = h[i] - g[i];
+        }
+
+        for (int i = 0; i <= 2; i++) {
+            s[i] = (0.5*a[i]*interval*interval);
+        }
+
+        curx += s[0];
+        cury += s[1];
+
+        bcurr[0] = compassX;
+        bcurr[1] = compassY;
+        bcurr[2] = compassZ;
+
+        cuth = dotProduct(bcurr, y);
+
+
+    }
+
+    public double dotProduct(double[] p, double[] q) {
+        double product = (p[0]*q[0]) + (p[1]*q[1]) + (p[2]*q[2]);
+        return product;
     }
 }
