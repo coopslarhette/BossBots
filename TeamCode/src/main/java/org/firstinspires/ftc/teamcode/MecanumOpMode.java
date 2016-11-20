@@ -148,28 +148,7 @@ public abstract class MecanumOpMode extends OpMode implements SensorEventListene
         //Move right of the beacon
     }
 
-    public void rightColor() {
-        //Red > blue --> red
-        if (teamColor.equalsIgnoreCase("r")) {
-            if (color.red() > color.blue()) {
-                buttonPresser.setPosition(1);
-            } else if (color.red() < color.blue()) {
-                // Move to other beacon
-                buttonPresser.setPosition(1);
-            } else {
-                telemetry.addData("Error!!!!", "Not any color!!!!!");
-            }
-        } else {
-            if (color.red() < color.blue()) {
-                buttonPresser.setPosition(1);
-            } else if (color.red() > color.blue()) {
-                // Move to other beacon
-                buttonPresser.setPosition(1);
-            } else {
-                telemetry.addData("Error!!!!", "Not any color!!!!!");
-            }
-        }
-    }
+
 
     public void onAccuracyChanged(Sensor sensor, int accuracy) {
         // Ignoring this for now
