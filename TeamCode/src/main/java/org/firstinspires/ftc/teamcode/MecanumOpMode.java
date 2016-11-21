@@ -13,8 +13,21 @@ import com.qualcomm.robotcore.hardware.LightSensor;
 import com.qualcomm.robotcore.hardware.Servo;
 
 /**
- * Created by Stone Mao & Cooper LaRhette
+ * Created by Stone Mao & Cooper LaRhette in the 2016-2017 school year
+ * for the Campolindo High School robotics team
  */
+
+ /*
+    *   Motor position
+    *
+    * motor4     motor3
+    *    []-------[]
+    *      |     |
+    *      |     |
+    *      |     |
+    *    []-------[]
+    *  motor1    motor2
+    */
 
 public abstract class MecanumOpMode extends OpMode implements SensorEventListener {
 
