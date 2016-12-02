@@ -130,7 +130,9 @@ public class TeleopTeam524 extends MecanumOpMode
         else
             belt.setPower(0);
         sweeper.setPower(gamepad1.left_trigger);
-        eightyTwenty.setPower(gamepad1.right_trigger);
+
+        // If right bumper is pressed while right trigger is pressed --> retract it
+        eightyTwenty.setPower(etChange()*gamepad1.right_trigger);
     }
 
     /*
@@ -139,7 +141,13 @@ public class TeleopTeam524 extends MecanumOpMode
     @Override
     public void stop() {
     }
-
+    public double etChange(){
+        if(gamepad1.right_bumper){
+            return -1;
+        } else {
+            return  0.1;
+        }
+    }
 
 
 }

@@ -1,93 +1,73 @@
+/*
+Copyright (c) 2016 Robert Atkinson
 
+All rights reserved.
+
+Redistribution and use in source and binary forms, with or without modification,
+are permitted (subject to the limitations in the disclaimer below) provided that
+the following conditions are met:
+
+Redistributions of source code must retain the above copyright notice, this list
+of conditions and the following disclaimer.
+
+Redistributions in binary form must reproduce the above copyright notice, this
+list of conditions and the following disclaimer in the documentation and/or
+other materials provided with the distribution.
+
+Neither the name of Robert Atkinson nor the names of his contributors may be used to
+endorse or promote products derived from this software without specific prior
+written permission.
+
+NO EXPRESS OR IMPLIED LICENSES TO ANY PARTY'S PATENT RIGHTS ARE GRANTED BY THIS
+LICENSE. THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+"AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO,
+THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESSFOR A PARTICULAR PURPOSE
+ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE
+FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
+DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
+CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR
+TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
+THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+*/
 package org.firstinspires.ftc.teamcode;
-
-import com.qualcomm.robotcore.eventloop.opmode.Disabled;
-import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
-import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
-import com.qualcomm.robotcore.hardware.ColorSensor;
-import com.qualcomm.robotcore.hardware.DcMotor;
-import com.qualcomm.robotcore.hardware.DcMotorSimple;
-import com.qualcomm.robotcore.util.ElapsedTime;
 
 import android.content.Context;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
-import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
-import android.util.StringBuilderPrinter;
 
-/**
- * This file contains an minimal example of a Linear "OpMode". An OpMode is a 'program' that runs in either
- * the autonomous or the teleop period of an FTC match. The names of OpModes appear on the menu
- * of the FTC Driver Station. When an selection is made from the menu, the corresponding OpMode
- * class is instantiated on the Robot Controller and executed.
- * <p>
- * This particular OpMode just executes a basic Tank Drive Teleop for a PushBot
- * It includes all the skeletal structure that all linear OpModes contain.
- * <p>
- * Use Android Studios to Copy this Class, and Paste it into your team's code folder with a new name.
- * Remove or comment out the @Disabled line to add this opmode to the Driver Station OpMode list
- */
+import com.qualcomm.robotcore.eventloop.opmode.*;
+import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.DcMotorSimple;
+import com.qualcomm.robotcore.util.ElapsedTime;
 
-@TeleOp(name = "Template: Linear OpMode", group = "Linear Opmode")
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.OutputStreamWriter;
+
+
+@com.qualcomm.robotcore.eventloop.opmode.Autonomous (name = "Team 524 Autonomous", group = "Iterative Opmode")
 // @Autonomous(...) is the other common choice
 @Disabled
-public class Autonomous extends LinearOpMode implements SensorEventListener {
-
-    /**
-     * y-axis is along the magnetic field. We need to see if that is north or south. We need to manually calculate
-     * the offset of the gamefield y-axis from the magnetic y-axis and store its value in radians in the variable "calibration".
-     * The angle "calibration" is entered into a rotation matrix that rotates the y vector about the g[] vector.
-     * More info on that here: https://en.wikipedia.org/wiki/Rotation_matrix#Rotation_matrix_from_axis_and_angle
-     * As the basis vector x[] is calculated as the cross product of y[] after rotation and g[], the x[] vector
-     * is already rotated when we calculate it, so it does not need to be rotated.
-     * z-axis is vertically down, in the direction of acceleration due to gravity.
-     * x-axis can then be figured out using the property that j X k = i, where i, j and k are the standard basis
-     * vectors. So we use the Right Hand Rule to figure out the x-axis.
-     * <p>
-     * The angle theta is measured counterclockwise from the y-axis.
-     * We are using the SI units (meters, seconds, radians, etc.)
-     * The terms "reference frame", "coordinate system" and "coords" mean the same thing in the context of this code.
-     * <p>
-     * Knowledge of linear algebra will be helpful for understanding the code.
-     * <p>
-     * The vector resultant[] is fed into the motor as follows: motor 1 gets resultant[0], motor 2 gets resultant[1],
-     * motor 3 gets resultant[2] and motor 4 gets resultant[3].
-     **/
-
-
-
-
-  /* forward[] is in the positive x direction, right[] is in the positive y direction, and ccw[] is (obviously) in the counterclockwise
-   * direction, which is positive theta direction.
-   **/
-
-
-
-
-  /* Declare OpMode members. */
+public class Autonomous524 extends MecanumOpMode {
+    /* Declare OpMode members. */
     private ElapsedTime runtime = new ElapsedTime();
+    private DcMotor belt;
+    private DcMotor eightyTwenty;
+    private DcMotor sweeper;
 
-
-    private DcMotor motor1;
-    private DcMotor motor2;
-    private DcMotor motor3;
-    private DcMotor motor4;
-
-
-    public SensorManager sensorService;
+    //Phone sensors
     private Sensor magnetometer;
     private Sensor accelerometer;
-    public ColorSensor color;
-    public float compassX;
-    public float compassY;
-    public float compassZ;
+    private float compassX;
+    private float compassY;
+    private float compassZ;
     public float accX;
     public float accY;
     public float accZ;
 
-
-    // NEEDED FOR PID
+    //PID VARS
     private double setx, sety, seth; //set points for x, y and theta
     private double setxNorm, setyNorm; //lengths of the setpoint vectors (needed after conversion into phone coordinate system)
     private double lerrx, lerry, lerth; //last errors in x, y and theta
@@ -104,7 +84,6 @@ public class Autonomous extends LinearOpMode implements SensorEventListener {
     private double[] right; //the vector to take me right
     private double[] ccw; //the vector to take me counterclockwise
     private double[] resultant; //the resultant vector
-
 
     private double[] b; //initial magnetic field vector
     private double[] bprime; //projection of magnetic field on the plane perpendicular to the gravitational field vector
@@ -136,9 +115,25 @@ public class Autonomous extends LinearOpMode implements SensorEventListener {
     private double calibration; //stores the offset between the magnetic y-axis and the gamefield y-axis in RADIANS
 
 
+    /*
+    *   Motor position
+    *
+    * motor4     motor3
+    *    []-------[]
+    *      |     |
+    *      |     |
+    *      |     |
+    *    []-------[]
+    *  motor1    motor2
+    */
+
+    /*
+     * Code to run ONCE when the driver hits INIT
+     */
     @Override
-    public void runOpMode() throws InterruptedException {
-        // Initialize Motor
+    public void init() {
+
+
         motor1 = hardwareMap.dcMotor.get("motor1");
         motor1.setDirection(DcMotorSimple.Direction.REVERSE);
         motor2 = hardwareMap.dcMotor.get("motor2");
@@ -146,18 +141,25 @@ public class Autonomous extends LinearOpMode implements SensorEventListener {
         motor4 = hardwareMap.dcMotor.get("motor4");
         motor4.setDirection(DcMotorSimple.Direction.REVERSE);
 
+        light = hardwareMap.lightSensor.get("light");
+
+        color = hardwareMap.colorSensor.get("color");
+
+        teamColor = "r";
+
         //Initialize sensor service
         sensorService = (SensorManager) hardwareMap.appContext.getSystemService(Context.SENSOR_SERVICE);
+        telemetry.addData("Status", "Created SensorService");
         //Magnetometer initialization
         magnetometer = sensorService.getDefaultSensor(Sensor.TYPE_MAGNETIC_FIELD);
+        telemetry.addData("Status", "Created Magnenetometer");
         //Accelerometer initialization
         accelerometer = sensorService.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
-        //Color
-        color = hardwareMap.colorSensor.get("color");
-        //Adds both the sensors to the sensorService
+        telemetry.addData("Status", "Created Accelerometer");
         sensorService.registerListener(this, accelerometer, SensorManager.SENSOR_DELAY_FASTEST);
+        telemetry.addData("Status", "Registered acclerometer");
         sensorService.registerListener(this, magnetometer, SensorManager.SENSOR_DELAY_FASTEST);
-
+        telemetry.addData("Status", "Registered magnetometer");
 
         //x,y,z
         b = new double[3];
@@ -195,8 +197,6 @@ public class Autonomous extends LinearOpMode implements SensorEventListener {
         b[1] = compassY;
         b[2] = compassZ;
 
-        telemetry.addData("compass", b[0] + " " + b[1] + " " + b[2]);
-        telemetry.addData("Acc", g[0] + " " + g[1] + " " + g[2]);
 
         for (int i = 0; i <= 2; i++) {
             gprime[i] = (euclidianNorm(g[i], g[0], g[1], g[2]));
@@ -236,32 +236,54 @@ public class Autonomous extends LinearOpMode implements SensorEventListener {
             matrixT[i][1] = y[i];
             matrixT[i][2] = gprime[i];
         }
-
-        waitForStart();
-        runtime.reset();
-
-        motor1.setPower(0.2);
-        motor2.setPower(0.2);
-        motor3.setPower(0.2);
-        motor4.setPower(0.2);
-        Thread.sleep(500);
-
-        /*
-        while(opModeIsActive()){
-            double[] res = resultant(1,0,0);
-            telemetry.addData("compass", b[0]+ " " +b[1]+ " " + b[2]);
-            telemetry.addData("Acc", g[0]+ " " +g[1]+ " " + g[2]);
-            telemetry.addData("0",res[0] + " "+ "1"+ res[1]+" "+"2"+res[2]+ " "+"3"+ res[3]);
-        }
-
-        motor1.setPower(resultant(1,0,0)[0]);
-        motor3.setPower(resultant(1,0,0)[2]);
-        motor4.setPower(resultant(1,0,0)[3]);
-        motor2.setPower(resultant(1,0,0)[1]);
-        Thread.sleep(10000);
-        */
+        telemetry.addData("Status", "Initialized");
     }
 
+    /*
+     * Code to run REPEATEDLY after the driver hits INIT, but before they hit PLAY
+     */
+    @Override
+    public void init_loop() {
+    }
+
+    /*
+     * Code to run ONCE when the driver hits PLAY
+     */
+    @Override
+    public void start() {
+        runtime.reset();
+    }
+
+    /*
+     * Code to run REPEATEDLY after the driver hits PLAY but before they hit STOP
+     */
+    private boolean task1=false;
+    @Override
+    public void loop() {
+        //telemetry.addData("Status", "Running: " + runtime.toString());
+
+        if(!task1){
+            if(light.getLightDetected()>0.049){
+                motor1.setPower(0);
+                motor3.setPower(0);
+                motor2.setPower(0);
+                motor4.setPower(0);
+                task1=true;
+            } else {
+                motor1.setPower(0.1);
+                motor3.setPower(0.1);
+                motor2.setPower(0.1);
+                motor4.setPower(0.1);
+            }
+        }
+    }
+
+    /*
+     * Code to run ONCE after the driver hits STOP
+     */
+    @Override
+    public void stop() {
+    }
 
     //this needs to repeat once every "interval"
     public double[] resultant(double mySetx, double mySety, double mySeth) {
@@ -384,46 +406,28 @@ public class Autonomous extends LinearOpMode implements SensorEventListener {
 
     public void onAccuracyChanged(Sensor sensor, int accuracy) {
         // Ignoring this for now
-
     }
 
-    public void rightColor() {
-        //Red > blue --> red
-        if (teamColor.equalsIgnoreCase("r")) {
-            if (color.red() > color.blue()) {
-                telemetry.addData("Color", "Red - YAY!!!");
-            } else if (color.red() < color.blue()) {
-                // Move to other beacon
-                telemetry.addData("Color", "Blue");
-            } else {
-                telemetry.addData("Color", "Not any color!!!!!");
-            }
-        } else {
-            if (color.red() < color.blue()) {
-                telemetry.addData("Color", "Blue - YAY!!!");
-            } else if (color.red() > color.blue()) {
-                // Move to other beacon
-                telemetry.addData("Color", "Red");
-            } else {
-                telemetry.addData("Color", "Not any color!!!!!");
-            }
-        }
-    }
-
-    @Override
     public void onSensorChanged(SensorEvent sensorEvent) {
         switch (sensorEvent.sensor.getType()) {
             case Sensor.TYPE_ACCELEROMETER:
                 accX = sensorEvent.values[0];
                 accY = sensorEvent.values[1];
                 accZ = sensorEvent.values[2];
+
                 break;
             case Sensor.TYPE_MAGNETIC_FIELD:
                 compassX = sensorEvent.values[0];
                 compassY = sensorEvent.values[1];
                 compassZ = sensorEvent.values[2];
+
                 break;
         }
+        // Print out data
+        telemetry.addData("red", color.red());
+        telemetry.addData("blue", color.blue());
+        telemetry.addData("green", color.green());
+        telemetry.addData("light", light.getLightDetected());
 
         // measured accelerations with gravity
         h[0] = accX;
@@ -525,6 +529,7 @@ public class Autonomous extends LinearOpMode implements SensorEventListener {
         if (crossBcpYNorm < crossBcpYPrimeNorm) {
             cuth = (2 * Math.PI) - cuth;
         }
+        telemetry.addData("Resultant",resultant(1,0,0)[0]);
     }
 
 
@@ -537,6 +542,5 @@ public class Autonomous extends LinearOpMode implements SensorEventListener {
     public double Norm(double[] vector) {
         return Math.sqrt(Math.pow(vector[0], 2) + Math.pow(vector[1], 2) + Math.pow(vector[2], 2));
     }
+
 }
-
-

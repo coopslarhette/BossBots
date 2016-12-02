@@ -40,6 +40,9 @@ public abstract class MecanumOpMode extends OpMode implements SensorEventListene
     private float compassX;
     private float compassY;
     private float compassZ;
+    public float accX;
+    public float accY;
+    public float accZ;
 
     private void turning() {
         motor1.setPower(-gamepad1.left_stick_x);
