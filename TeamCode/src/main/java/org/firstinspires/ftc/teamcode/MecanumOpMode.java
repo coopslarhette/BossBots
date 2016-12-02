@@ -13,8 +13,21 @@ import com.qualcomm.robotcore.hardware.LightSensor;
 import com.qualcomm.robotcore.hardware.Servo;
 
 /**
- * Created by Stone Mao & Cooper LaRhette
+ * Created by Stone Mao & Cooper LaRhette in the 2016-2017 school year
+ * for the Campolindo High School robotics team
  */
+
+ /*
+    *   Motor position
+    *
+    * motor4     motor3
+    *    []-------[]
+    *      |     |
+    *      |     |
+    *      |     |
+    *    []-------[]
+    *  motor1    motor2
+    */
 
 public abstract class MecanumOpMode extends OpMode implements SensorEventListener {
 
@@ -44,7 +57,7 @@ public abstract class MecanumOpMode extends OpMode implements SensorEventListene
     public float accY;
     public float accZ;
 
-    private void turning() {
+    public void turning() {
         motor1.setPower(-gamepad1.left_stick_x);
         motor2.setPower(gamepad1.left_stick_x);
         motor3.setPower(gamepad1.left_stick_x);
@@ -93,7 +106,7 @@ public abstract class MecanumOpMode extends OpMode implements SensorEventListene
         double cos1and3 = length * Math.round(Math.cos(angle - Math.PI / 4)*10.0)/10.0;
 
         //Driving
-        if (gamepad1.right_stick_x > 0.03) {
+        if (Math.abs(gamepad1.right_stick_x) > 0.03) {
             turning();
         } else {
             motor1.setPower(cos1and3);
