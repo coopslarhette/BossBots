@@ -37,24 +37,28 @@ import android.content.Context;
 import android.hardware.Sensor;
 import android.hardware.SensorManager;
 import android.os.Bundle;
+
 import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
+import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 
-@TeleOp(name="Team 524 Teleop", group="Iterative Opmode")  // @Autonomous(...) is the other common choice
+@TeleOp(name = "Team 524 Teleop", group = "Iterative Opmode")
+// @Autonomous(...) is the other common choice
 @Disabled
-public class TeleopTeam524 extends MecanumOpMode
-{
+public class TeleopTeam524 extends MecanumOpMode {
     /* Declare OpMode members. */
     private ElapsedTime runtime = new ElapsedTime();
     private DcMotor belt;
     private DcMotor eightyTwenty;
     private DcMotor sweeper;
-
+    private Servo ballKeeper;
+    private Servo flicker;
+    private Servo servoSweeper;
 
     /*
     *   Motor position
@@ -82,6 +86,10 @@ public class TeleopTeam524 extends MecanumOpMode
         motor4 = hardwareMap.dcMotor.get("motor4");
         motor4.setDirection(DcMotorSimple.Direction.REVERSE);
 
+        ballKeeper = hardwareMap.servo.get("ballKeeper");
+        flicker = hardwareMap.servo.get("flicker");
+        servoSweeper = hardwareMap.servo.get("servoSweeper");
+
         light = hardwareMap.lightSensor.get("light");
 
         belt = hardwareMap.dcMotor.get("belt");
@@ -89,7 +97,7 @@ public class TeleopTeam524 extends MecanumOpMode
         sweeper = hardwareMap.dcMotor.get("sweeper");
 
         eightyTwenty = hardwareMap.dcMotor.get("eightytwenty");
-        
+
         color = hardwareMap.colorSensor.get("color");
 
         teamColor = "r";
@@ -98,6 +106,7 @@ public class TeleopTeam524 extends MecanumOpMode
         sensorService.registerListener(this,
                 sensorService.getDefaultSensor(Sensor.TYPE_MAGNETIC_FIELD),
                 SensorManager.SENSOR_DELAY_NORMAL);
+        ballKeeper.setPosition(0.6);
     }
 
     /*
@@ -121,18 +130,25 @@ public class TeleopTeam524 extends MecanumOpMode
     @Override
     public void loop() {
         telemetry.addData("Status", "Running: " + runtime.toString());
-        driveOneJoystick(1,"left");
-        telemetry.addData("x value" , gamepad1.left_stick_x);
-        telemetry.addData("y value" , gamepad1.left_stick_y);
-        telemetry.addData("angle" , (getJoystickAngle(gamepad1.left_stick_x, gamepad1.left_stick_y) * 180/Math.PI));
-        if (gamepad1.x)
-            belt.setPower(1);
-        else
-            belt.setPower(0);
-        sweeper.setPower(gamepad1.left_trigger);
+        driveOneJoystick(1, "left");
+        telemetry.addData("x value", gamepad1.left_stick_x);
+        telemetry.addData("y value", gamepad1.left_stick_y);
+        telemetry.addData("angle", (getJoystickAngle(gamepad1.left_stick_x, gamepad1.left_stick_y) * 180 / Math.PI));
+        //Sets power of belt and sweeper, left bumper reverses
+        belt.setPower(gamepad2.left_trigger);
+        sweeper.setPower(gamepad2.left_trigger * etChange(0));
 
-        // If right bumper is pressed while right trigger is pressed --> retract it
-        eightyTwenty.setPower(etChange()*gamepad1.right_trigger);
+        // If right bumper is pressed while right trigger is pressed --> reverse it
+        eightyTwenty.setPower(etChange(0.1) * gamepad1.right_trigger);
+        if (gamepad2.a)
+            flicker.setPosition(0.2);
+        else
+            flicker.setPosition(0.8);
+
+        if (gamepad2.y)
+            servoSweeper.setPosition(1);
+        else
+            servoSweeper.setPosition(0.5);
     }
 
     /*
@@ -141,11 +157,12 @@ public class TeleopTeam524 extends MecanumOpMode
     @Override
     public void stop() {
     }
-    public double etChange(){
-        if(gamepad1.right_bumper){
+
+    public double etChange(double num) {
+        if (gamepad2.right_bumper || gamepad2.left_bumper) {
             return -1;
         } else {
-            return  0.1;
+            return num;
         }
     }
 
