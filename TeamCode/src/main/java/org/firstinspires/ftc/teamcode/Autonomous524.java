@@ -111,7 +111,7 @@ public class Autonomous524 extends MecanumOpMode {
     private double[] crossBcpY; //cross product of bcurrPrime and y
     private double[] crossBcpYPrime; //cross product of y and bcurrPrime
     private String teamColor;
-    private int interval = SensorManager.SENSOR_DELAY_FASTEST; //interval for integration; should be the same as the sample period for the IMU
+    private int interval = SensorManager.SENSOR_DELAY_GAME; //interval for integration; should be the same as the sample period for the IMU
     private double calibration; //stores the offset between the magnetic y-axis and the gamefield y-axis in RADIANS
 
 
@@ -156,9 +156,9 @@ public class Autonomous524 extends MecanumOpMode {
         //Accelerometer initialization
         accelerometer = sensorService.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
         telemetry.addData("Status", "Created Accelerometer");
-        sensorService.registerListener(this, accelerometer, SensorManager.SENSOR_DELAY_FASTEST);
+        sensorService.registerListener(this, accelerometer, SensorManager.SENSOR_DELAY_GAME);
         telemetry.addData("Status", "Registered acclerometer");
-        sensorService.registerListener(this, magnetometer, SensorManager.SENSOR_DELAY_FASTEST);
+        sensorService.registerListener(this, magnetometer, SensorManager.SENSOR_DELAY_GAME);
         telemetry.addData("Status", "Registered magnetometer");
 
         //x,y,z
@@ -185,6 +185,9 @@ public class Autonomous524 extends MecanumOpMode {
         s = new double[3];
         matrixT = new double[3][3];
         matrixR = new double[3][3];
+        curx = 5;//initialize curx to the initial gamefield x coord in METERS
+        cury = 5;//initialize cury to the initial gamefield y coord in METERS
+        cuth = 0;//random initial value for cuth, because it is continuously evaluated (I don’t think we need this)
         //setx = new double[3]; setx and sety can be scalars because they are entered in the gamefield coordinate system
         //sety = new double[3];
 
@@ -257,23 +260,32 @@ public class Autonomous524 extends MecanumOpMode {
     /*
      * Code to run REPEATEDLY after the driver hits PLAY but before they hit STOP
      */
-    private boolean task1=false;
+    private boolean task1=false; // Shoot
+    private boolean task2=false; // Drive forward a little bit
+    private boolean task3=false; // Drive forward a little bit
+    private double time;
     @Override
     public void loop() {
         //telemetry.addData("Status", "Running: " + runtime.toString());
-
+        telemetry.addData("Resultant", resultant(1,0,0)[0]);
         if(!task1){
-            if(light.getLightDetected()>0.049){
-                motor1.setPower(0);
-                motor3.setPower(0);
-                motor2.setPower(0);
-                motor4.setPower(0);
-                task1=true;
+            if(Double.parseDouble(runtime.toString())<2.00){
+
             } else {
-                motor1.setPower(0.1);
-                motor3.setPower(0.1);
-                motor2.setPower(0.1);
-                motor4.setPower(0.1);
+                task1 = true;
+                time = Double.parseDouble(runtime.toString());
+            }
+        } else if(!task2){
+            if(Double.parseDouble(runtime.toString())<time+1.5){
+                driveAngle(0,1);
+            } else {
+                time = Double.parseDouble(runtime.toString());
+            }
+        } else if(!task3){
+            if(Double.parseDouble(runtime.toString())<time+3){
+                driveAngle(45/180*Math.PI,1);
+            } else {
+                time = Double.parseDouble(runtime.toString());
             }
         }
     }
@@ -430,13 +442,7 @@ public class Autonomous524 extends MecanumOpMode {
         telemetry.addData("light", light.getLightDetected());
 
         // measured accelerations with gravity
-        h[0] = accX;
-        h[1] = accY;
-        h[2] = accZ;
 
-        for (int i = 0; i <= 2; i++) {
-            a[i] = h[i] - g[i];
-        }
 
         //removing gravity
         for (int i = 0; i <= 2; i++) {

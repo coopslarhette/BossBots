@@ -85,7 +85,7 @@ public class TeleopTeam524 extends MecanumOpMode
         light = hardwareMap.lightSensor.get("light");
 
         belt = hardwareMap.dcMotor.get("belt");
-
+        belt.setDirection(DcMotorSimple.Direction.REVERSE);
         sweeper = hardwareMap.dcMotor.get("sweeper");
 
         eightyTwenty = hardwareMap.dcMotor.get("eightytwenty");
