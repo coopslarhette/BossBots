@@ -85,6 +85,7 @@ public class TeleopTeam524 extends MecanumOpMode {
         motor3 = hardwareMap.dcMotor.get("motor3");
         motor4 = hardwareMap.dcMotor.get("motor4");
         motor4.setDirection(DcMotorSimple.Direction.REVERSE);
+
         shooter = hardwareMap.dcMotor.get("shooter");
 
         ballKeeper = hardwareMap.servo.get("ballKeeper");
@@ -106,7 +107,7 @@ public class TeleopTeam524 extends MecanumOpMode {
         sensorService.registerListener(this,
                 sensorService.getDefaultSensor(Sensor.TYPE_MAGNETIC_FIELD),
                 SensorManager.SENSOR_DELAY_NORMAL);
-        ballKeeper.setPosition(0.6);
+        ballKeeper.setPosition(0.55);
     }
 
     /*
@@ -138,7 +139,9 @@ public class TeleopTeam524 extends MecanumOpMode {
         belt.setPower(gamepad2.left_trigger);
         sweeper.setPower(gamepad2.left_trigger * etChange(1));
         if (gamepad2.x) {
-            shooter.setPower(1);
+            shooter.setPower(0.6);
+        } else {
+            shooter.setPower(0);
         }
 
         // If right bumper is pressed while right trigger is pressed --> reverse it

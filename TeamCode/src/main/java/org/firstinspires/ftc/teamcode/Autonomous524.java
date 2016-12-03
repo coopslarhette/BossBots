@@ -40,6 +40,7 @@ import android.hardware.SensorManager;
 import com.qualcomm.robotcore.eventloop.opmode.*;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
+import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 import java.io.File;
@@ -113,6 +114,9 @@ public class Autonomous524 extends MecanumOpMode {
     private String teamColor;
     private int interval = SensorManager.SENSOR_DELAY_GAME; //interval for integration; should be the same as the sample period for the IMU
     private double calibration; //stores the offset between the magnetic y-axis and the gamefield y-axis in RADIANS
+    private DcMotor shooter;
+    private Servo ballKeeper;
+    private Servo flicker;
 
 
     /*
@@ -239,6 +243,11 @@ public class Autonomous524 extends MecanumOpMode {
             matrixT[i][1] = y[i];
             matrixT[i][2] = gprime[i];
         }
+        shooter = hardwareMap.dcMotor.get("shooter");
+
+        ballKeeper = hardwareMap.servo.get("ballKeeper");
+        flicker = hardwareMap.servo.get("flicker");
+        ballKeeper.setPosition(0.4);
         telemetry.addData("Status", "Initialized");
     }
 
@@ -263,28 +272,41 @@ public class Autonomous524 extends MecanumOpMode {
     private boolean task1=false; // Shoot
     private boolean task2=false; // Drive forward a little bit
     private boolean task3=false; // Drive forward a little bit
+    private boolean task4=false; // Drive forward a little bit
     private double time;
+    private final double shooterTime = 1.5;
+    private final double LIGHT = 0.08;
     @Override
     public void loop() {
         //telemetry.addData("Status", "Running: " + runtime.toString());
         telemetry.addData("Resultant", resultant(1,0,0)[0]);
         if(!task1){
-            if(Double.parseDouble(runtime.toString())<2.00){
-
+            if(Double.parseDouble(runtime.toString())<1.5){
+                driveAngle(Math.PI,1);
             } else {
-                task1 = true;
                 time = Double.parseDouble(runtime.toString());
+                driveAngle(Math.PI,0);
+                task1 = true;
             }
         } else if(!task2){
-            if(Double.parseDouble(runtime.toString())<time+1.5){
-                driveAngle(0,1);
+            if(Double.parseDouble(runtime.toString())<time+shooterTime){
+                shooter.setPower(0.6);
             } else {
+                task2 = true;
+                shooter.setPower(0);
                 time = Double.parseDouble(runtime.toString());
             }
         } else if(!task3){
-            if(Double.parseDouble(runtime.toString())<time+3){
-                driveAngle(45/180*Math.PI,1);
+            flicker.setPosition(0.2);
+            task3 = true;
+            time = Double.parseDouble(runtime.toString());
+        } else if(!task4){
+            flicker.setPosition(0.6);
+            if(Double.parseDouble(runtime.toString())<time+shooterTime){
+                shooter.setPower(0.6);
             } else {
+                task2 = true;
+                shooter.setPower(0);
                 time = Double.parseDouble(runtime.toString());
             }
         }
