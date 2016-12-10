@@ -364,8 +364,14 @@ public class Autonomous524 extends MecanumOpMode {
             setyT[i] = sety * matrixT[i][1];
         }
 
+        telemetry.addData("setXT0", setxT[0]);
+        telemetry.addData("setXT1", setxT[1]);
+        telemetry.addData("setXT2", setxT[2]);
+
         setxNorm = Norm(setxT);
         setyNorm = Norm(setyT);
+        telemetry.addData("setXN", setxNorm);
+        telemetry.addData("setYN", setyNorm);
 
         //errors in the robot's state are calculated as (setpoint-current)
         errx = setxNorm - curx;
@@ -401,9 +407,7 @@ public class Autonomous524 extends MecanumOpMode {
         outy = (py * erry) + (dy * dery);
         outh = (pt * erth) + (dt * dert);
 
-        telemetry.addData("outX", outx);
-        telemetry.addData("outY", outy);
-        telemetry.addData("outh", outh);
+
 
 
         //limit the outputs to [-1,1]
