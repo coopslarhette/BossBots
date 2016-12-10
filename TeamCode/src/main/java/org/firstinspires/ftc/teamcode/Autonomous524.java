@@ -296,48 +296,33 @@ public class Autonomous524 extends MecanumOpMode {
     /*
      * Code to run REPEATEDLY after the driver hits PLAY but before they hit STOP
      */
-    private boolean task1=false; // Shoot
-    private boolean task2=false; // Drive forward a little bit
-    private boolean task3=false; // Drive forward a little bit
-    private boolean task4=false; // Drive forward a little bit
-    private double time;
+    private boolean task1=false; //Drive forward
+    private boolean task2=false; //Shoot 1 ball
     private final double shooterTime = 800;
     private final double LIGHT = 0.08;
+    private double time=0;
     @Override
     public void loop() {
         //telemetry.addData("Status", "Running: " + runtime.toString());
         telemetry.addData("Resultant", resultant(1,0,0)[0]);
         telemetry.addData("Runtime", runtime.milliseconds());
-       /* if(!task1){
-            if(runtime.milliseconds()<800){
-                driveAngle(0,1);
+        if(!task1){
+            if(runtime.milliseconds() != 1000){
+                driveAngle(0,0.7);
             } else {
-                time = runtime.milliseconds();
-                driveAngle(0,0);
                 task1 = true;
+                driveAngle(0,0);
+                time+=1000;
             }
         } else if(!task2){
-            if(runtime.milliseconds()<time+shooterTime){
-                shooter.setPower(0.6);
+            if(runtime.milliseconds() != time+shooterTime){
+                shooter.setPower(1);
             } else {
                 task2 = true;
                 shooter.setPower(0);
-                time = runtime.milliseconds();
+                time+=shooterTime;
             }
-        } else if(!task3){
-            flicker.setPosition(0.2);
-            task3 = true;
-            time = runtime.milliseconds();
-        } else if(!task4){
-            flicker.setPosition(0.6);
-            if(runtime.milliseconds()<time+shooterTime){
-                shooter.setPower(0.6);
-            } else {
-                task2 = true;
-                shooter.setPower(0);
-                time = runtime.milliseconds();
-            }
-        }*/
+        }
     }
 
     /*
