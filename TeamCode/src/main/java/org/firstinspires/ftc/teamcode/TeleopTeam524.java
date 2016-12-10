@@ -59,6 +59,7 @@ public class TeleopTeam524 extends MecanumOpMode {
     private DcMotor shooter;
     private Servo ballKeeper;
     private Servo flicker;
+    private Servo liftKeep;
 
     /*
     *   Motor position
@@ -85,27 +86,27 @@ public class TeleopTeam524 extends MecanumOpMode {
         motor3 = hardwareMap.dcMotor.get("motor3");
         motor4 = hardwareMap.dcMotor.get("motor4");
         motor4.setDirection(DcMotorSimple.Direction.REVERSE);
+
         shooter = hardwareMap.dcMotor.get("shooter");
-
-        ballKeeper = hardwareMap.servo.get("ballKeeper");
-        flicker = hardwareMap.servo.get("flicker");
-
-        light = hardwareMap.lightSensor.get("light");
-
         belt = hardwareMap.dcMotor.get("belt");
         belt.setDirection(DcMotorSimple.Direction.REVERSE);
         sweeper = hardwareMap.dcMotor.get("sweeper");
-
         eightyTwenty = hardwareMap.dcMotor.get("eightytwenty");
+        eightyTwenty.setDirection(DcMotorSimple.Direction.REVERSE);
 
+        ballKeeper = hardwareMap.servo.get("ballKeeper");
+        flicker = hardwareMap.servo.get("flicker");
+        liftKeep = hardwareMap.servo.get("liftKeep");
+
+        light = hardwareMap.lightSensor.get("light");
         color = hardwareMap.colorSensor.get("color");
-
         teamColor = "r";
 
         sensorService = (SensorManager) hardwareMap.appContext.getSystemService(Context.SENSOR_SERVICE);
         sensorService.registerListener(this,
                 sensorService.getDefaultSensor(Sensor.TYPE_MAGNETIC_FIELD),
                 SensorManager.SENSOR_DELAY_NORMAL);
+
         ballKeeper.setPosition(0.6);
         flicker.setPosition(0.55);
     }
@@ -134,22 +135,29 @@ public class TeleopTeam524 extends MecanumOpMode {
         driveOneJoystick(1, "left");
         telemetry.addData("x value", gamepad1.left_stick_x);
         telemetry.addData("y value", gamepad1.left_stick_y);
-        telemetry.addData("angle", (getJoystickAngle(gamepad1.left_stick_x, gamepad1.left_stick_y) * 180 / Math.PI));
-        //Sets power of belt and sweeper, left bumper reverses
+        telemetry.addData("angle", (getJoystickAngle(gamepad1.left_stick_x, gamepad1.left_stick_y)
+                * 180 / Math.PI));
+
+        /**
+         * Sets power of belt, sweeper, and eighty-twenty lift; left bumper or right bumper
+         * reverses sweeper and eight-twenty.
+         */
         belt.setPower(gamepad2.left_trigger);
         sweeper.setPower(gamepad2.left_trigger * etChange(1));
-        if (gamepad2.x) {
-            shooter.setPower(0.6);
-        } else {
-            shooter.setPower(0);
-        }
+        eightyTwenty.setPower(etChange(0.2) * gamepad2.right_trigger);
 
-        // If right bumper is pressed while right trigger is pressed --> reverse it
-        eightyTwenty.setPower(etChange(0.1) * gamepad2.right_trigger);
+        if (gamepad2.x)
+            shooter.setPower(0.6);
+        else
+            shooter.setPower(0);
         if (gamepad2.a)
             flicker.setPosition(0.2);
         else
             flicker.setPosition(0.55);
+
+        //Servo for releasing the eighty-twenty
+        if ((gamepad2.right_stick_button && gamepad2.left_stick_button) || runtime.seconds() >= 90)
+            liftKeep.setPosition(1);
     }
 
     /*
@@ -159,6 +167,12 @@ public class TeleopTeam524 extends MecanumOpMode {
     public void stop() {
     }
 
+    /**
+     * Method for reversing action motors.
+     *
+     * @param num the number that it returns if neither bumber is pressed.
+     * @return returns either -1 to reverse an a all action motots, or num.
+     */
     public double etChange(double num) {
         if (gamepad2.right_bumper || gamepad2.left_bumper) {
             return -1;

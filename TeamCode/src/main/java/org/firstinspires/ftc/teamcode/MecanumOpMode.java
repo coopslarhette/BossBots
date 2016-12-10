@@ -36,7 +36,6 @@ public abstract class MecanumOpMode extends OpMode implements SensorEventListene
     public DcMotor motor3;
     public DcMotor motor4;
 
-
     private Servo buttonPresser;
 
     public String teamColor;
