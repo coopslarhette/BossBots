@@ -121,14 +121,13 @@ public abstract class MecanumOpMode extends OpMode implements SensorEventListene
     public void driveAngle(double angle, double scale) {
         double sin2and4 = scale * Math.round(Math.sin(angle - Math.PI / 4) * 10.0) / 10.0;
         double cos1and3 = scale * Math.round(Math.cos(angle - Math.PI / 4) * 10.0) / 10.0;
+        motor1.setPower(cos1and3);
+        motor2.setPower(sin2and4);
+        motor3.setPower(cos1and3);
+        motor4.setPower(sin2and4);
     }
 
     public void turn(int angle) {
-//        telemetry.addData("x", compassX);
-//        telemetry.addData("y", compassY);
-//        telemetry.addData("z", compassZ);
-
-
     }
 
     /**
