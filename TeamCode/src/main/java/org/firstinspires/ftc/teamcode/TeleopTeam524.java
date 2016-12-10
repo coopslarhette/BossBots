@@ -109,6 +109,7 @@ public class TeleopTeam524 extends MecanumOpMode {
 
         ballKeeper.setPosition(0);
         flicker.setPosition(0.55);
+        liftKeep.setPosition(0);
     }
 
     /*
@@ -157,7 +158,7 @@ public class TeleopTeam524 extends MecanumOpMode {
 
         //Servo for releasing the eighty-twenty
         if (gamepad2.b)  //(gamepad2.right_stick_button && gamepad2.left_stick_button) || runtime.seconds() >= 90
-            liftKeep.setPosition(1);
+            liftKeep.setPosition(0);
     }
 
     /*
