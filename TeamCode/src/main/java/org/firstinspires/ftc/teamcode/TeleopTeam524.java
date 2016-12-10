@@ -157,7 +157,7 @@ public class TeleopTeam524 extends MecanumOpMode {
 
         //Servo for releasing the eighty-twenty
         if ((gamepad2.right_stick_button && gamepad2.left_stick_button) || runtime.seconds() >= 90)
-            liftKeep.setPosition(1);
+            liftKeep.setPosition(0.3);
     }
 
     /*
