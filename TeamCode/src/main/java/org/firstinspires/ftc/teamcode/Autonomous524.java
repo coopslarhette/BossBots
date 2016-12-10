@@ -138,6 +138,7 @@ public class Autonomous524 extends MecanumOpMode {
     private double crossBcpYPrimeNorm; //magnitude of crossBcpYPrime
     private double[] crossBcpY; //cross product of bcurrPrime and y
     private double[] crossBcpYPrime; //cross product of y and bcurrPrime
+    double[] resultant = new double[4];
     private String teamColor;
     private int interval = SensorManager.SENSOR_DELAY_GAME; //interval for integration; should be the same as the sample period for the IMU
     private double calibration = 4.5; //stores the offset between the magnetic y-axis and the gamefield y-axis in RADIANS
@@ -307,7 +308,7 @@ public class Autonomous524 extends MecanumOpMode {
         //telemetry.addData("Status", "Running: " + runtime.toString());
         telemetry.addData("Resultant", resultant(1,0,0)[0]);
         telemetry.addData("Runtime", runtime.milliseconds());
-        if(!task1){
+       /* if(!task1){
             if(runtime.milliseconds()<800){
                 driveAngle(0,1);
             } else {
@@ -336,7 +337,7 @@ public class Autonomous524 extends MecanumOpMode {
                 shooter.setPower(0);
                 time = runtime.milliseconds();
             }
-        }
+        }*/
     }
 
     /*
@@ -387,12 +388,12 @@ public class Autonomous524 extends MecanumOpMode {
         /**set the p and d constants after calibration
          *(how about make a neural network to do machine learning and let the phone figure these out on its own?)
          */
-        px = 2;
-        py = 2;
-        pt = 2;
-        dx = 2;
-        dy = 2;
-        dt = 2;
+        px = 1000;
+        py = 200;
+        pt = 500;
+        dx = 700;
+        dy = 350;
+        dt = 100;
 
 
         // outputs for the variables
@@ -435,7 +436,7 @@ public class Autonomous524 extends MecanumOpMode {
         }
 
 
-        double[] resultant = new double[4];
+
         //assign the vectors
         double forward[] = {(outx * -1), (outx * 1), (outx * 1), (outx * -1)};
         double right[] = {(outy * 1), (outy * 1), (outy * -1), (outy * -1)};
