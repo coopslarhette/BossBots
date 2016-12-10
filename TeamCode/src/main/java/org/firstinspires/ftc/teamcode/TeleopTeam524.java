@@ -107,7 +107,7 @@ public class TeleopTeam524 extends MecanumOpMode {
                 sensorService.getDefaultSensor(Sensor.TYPE_MAGNETIC_FIELD),
                 SensorManager.SENSOR_DELAY_NORMAL);
 
-        ballKeeper.setPosition(0.2);
+        ballKeeper.setPosition(0);
         flicker.setPosition(0.55);
     }
 
@@ -142,12 +142,12 @@ public class TeleopTeam524 extends MecanumOpMode {
          * Sets power of belt, sweeper, and eighty-twenty lift; left bumper or right bumper
          * reverses sweeper and eight-twenty.
          */
-        belt.setPower(gamepad2.left_trigger);
-        sweeper.setPower(gamepad2.left_trigger * etChange(1));
-        eightyTwenty.setPower(etChange(0.2) * gamepad2.right_trigger);
+        belt.setPower(gamepad2.left_trigger * etChange());
+        sweeper.setPower(gamepad2.left_trigger * etChange());
+        eightyTwenty.setPower(etChange() * gamepad2.right_trigger);
 
         if (gamepad2.x)
-            shooter.setPower(0.6);
+            shooter.setPower(0.5);
         else
             shooter.setPower(0);
         if (gamepad2.a)
@@ -156,8 +156,8 @@ public class TeleopTeam524 extends MecanumOpMode {
             flicker.setPosition(0.55);
 
         //Servo for releasing the eighty-twenty
-        if ((gamepad2.right_stick_button && gamepad2.left_stick_button) || runtime.seconds() >= 90)
-            liftKeep.setPosition(0.3);
+        if (gamepad2.b)  //(gamepad2.right_stick_button && gamepad2.left_stick_button) || runtime.seconds() >= 90
+            liftKeep.setPosition(1);
     }
 
     /*
@@ -170,15 +170,13 @@ public class TeleopTeam524 extends MecanumOpMode {
     /**
      * Method for reversing action motors.
      *
-     * @param num the number that it returns if neither bumber is pressed.
      * @return returns either -1 to reverse an a all action motots, or num.
      */
-    public double etChange(double num) {
+    public double etChange() {
         if (gamepad2.right_bumper || gamepad2.left_bumper) {
-            return -1;
-        } else {
-            return num;
-        }
+            return -0.3;
+        } else
+            return 1;
     }
 
 
