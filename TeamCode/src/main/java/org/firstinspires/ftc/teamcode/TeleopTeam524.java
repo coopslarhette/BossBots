@@ -107,7 +107,7 @@ public class TeleopTeam524 extends MecanumOpMode {
                 sensorService.getDefaultSensor(Sensor.TYPE_MAGNETIC_FIELD),
                 SensorManager.SENSOR_DELAY_NORMAL);
 
-        ballKeeper.setPosition(0.6);
+        ballKeeper.setPosition(0.2);
         flicker.setPosition(0.55);
     }
 
