@@ -112,7 +112,6 @@ public class Autonomous524 extends MecanumOpMode {
     private double[] forward; //the vector for taking me forward
     private double[] right; //the vector to take me right
     private double[] ccw; //the vector to take me counterclockwise
-    private double[] resultant; //the resultant vector
 
     private double[] b; //initial magnetic field vector
     private double[] bprime; //projection of magnetic field on the plane perpendicular to the gravitational field vector
@@ -211,14 +210,13 @@ public class Autonomous524 extends MecanumOpMode {
         crossBcpYPrime = new double[3];
         bprime = new double[3];
         bcurrPrime = new double[3];
-        gprime = new double[3];
         x = new double[3];
         y = new double[3];
         s = new double[3];
         matrixT = new double[3][3];
         matrixR = new double[3][3];
         curx = 5;//initialize curx to the initial gamefield x coord in METERS
-        cury = 5;//initialize cury to the initial gamefield y coord in METERS
+        cury = 3;//initialize cury to the initial gamefield y coord in METERS
         cuth = 0;//random initial value for cuth, because it is continuously evaluated (I don’t think we need this)
         //setx = new double[3]; setx and sety can be scalars because they are entered in the gamefield coordinate system
         //sety = new double[3];
@@ -437,7 +435,7 @@ public class Autonomous524 extends MecanumOpMode {
         }
 
 
-        resultant = new double[4];
+        double[] resultant = new double[4];
         //assign the vectors
         double forward[] = {(outx * -1), (outx * 1), (outx * 1), (outx * -1)};
         double right[] = {(outy * 1), (outy * 1), (outy * -1), (outy * -1)};

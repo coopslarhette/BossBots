@@ -85,6 +85,7 @@ public class TeleopTeam524 extends MecanumOpMode {
         motor3 = hardwareMap.dcMotor.get("motor3");
         motor4 = hardwareMap.dcMotor.get("motor4");
         motor4.setDirection(DcMotorSimple.Direction.REVERSE);
+
         shooter = hardwareMap.dcMotor.get("shooter");
 
         ballKeeper = hardwareMap.servo.get("ballKeeper");
@@ -106,8 +107,7 @@ public class TeleopTeam524 extends MecanumOpMode {
         sensorService.registerListener(this,
                 sensorService.getDefaultSensor(Sensor.TYPE_MAGNETIC_FIELD),
                 SensorManager.SENSOR_DELAY_NORMAL);
-        ballKeeper.setPosition(0.6);
-        flicker.setPosition(0.55);
+        ballKeeper.setPosition(0.55);
     }
 
     /*

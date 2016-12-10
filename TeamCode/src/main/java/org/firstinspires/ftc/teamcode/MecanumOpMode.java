@@ -106,7 +106,7 @@ public abstract class MecanumOpMode extends OpMode implements SensorEventListene
         double cos1and3 = length * Math.round(Math.cos(angle - Math.PI / 4)*10.0)/10.0;
 
         //Driving
-        if (Math.abs(gamepad1.right_stick_x) > 0) {
+        if (Math.abs(gamepad1.right_stick_x) != 0) {
             turning();
         } else {
             motor1.setPower(cos1and3);
