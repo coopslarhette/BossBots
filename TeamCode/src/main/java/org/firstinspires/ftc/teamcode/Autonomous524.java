@@ -47,6 +47,34 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.OutputStreamWriter;
 
+/**
+ * y-axis is along the magnetic field. We need to see if that is north or south. We need to manually calculate
+ * the offset of the gamefield y-axis from the magnetic y-axis and store its value in radians in the variable "calibration".
+ * The angle "calibration" is entered into a rotation matrix that rotates the y vector about the g[] vector.
+ * More info on that here: https://en.wikipedia.org/wiki/Rotation_matrix#Rotation_matrix_from_axis_and_angle
+ * As the basis vector x[] is calculated as the cross product of y[] after rotation and g[], the x[] vector
+ * is already rotated when we calculate it, so it does not need to be rotated.
+ * z-axis is vertically down, in the direction of acceleration due to gravity.
+ * x-axis can then be figured out using the property that j X k = i, where i, j and k are the standard basis
+ * vectors. So we use the Right Hand Rule to figure out the x-axis.
+ *
+ * The angle theta is measured counterclockwise from the y-axis.
+ * We are using the SI units (meters, seconds, radians, etc.)
+ * The terms "reference frame", "coordinate system" and "coords" mean the same thing in the context of this code.
+ *
+ * Knowledge of linear algebra will be helpful for understanding the code.
+ *
+ * The vector resultant[] is fed into the motor as follows: motor 1 gets resultant[0], motor 2 gets resultant[1],
+ * motor 3 gets resultant[2] and motor 4 gets resultant[3].
+ **/
+
+
+
+
+  /* forward[] is in the positive x direction, right[] is in the positive y direction, and ccw[] is (obviously) in the counterclockwise
+   * direction, which is positive theta direction.
+   **/
+
 
 @com.qualcomm.robotcore.eventloop.opmode.Autonomous (name = "Team 524 Autonomous", group = "Iterative Opmode")
 // @Autonomous(...) is the other common choice
@@ -113,7 +141,7 @@ public class Autonomous524 extends MecanumOpMode {
     private double[] crossBcpYPrime; //cross product of y and bcurrPrime
     private String teamColor;
     private int interval = SensorManager.SENSOR_DELAY_GAME; //interval for integration; should be the same as the sample period for the IMU
-    private double calibration; //stores the offset between the magnetic y-axis and the gamefield y-axis in RADIANS
+    private double calibration = 4.5; //stores the offset between the magnetic y-axis and the gamefield y-axis in RADIANS
     private DcMotor shooter;
     private Servo ballKeeper;
     private Servo flicker;
@@ -274,40 +302,41 @@ public class Autonomous524 extends MecanumOpMode {
     private boolean task3=false; // Drive forward a little bit
     private boolean task4=false; // Drive forward a little bit
     private double time;
-    private final double shooterTime = 1.5;
+    private final double shooterTime = 800;
     private final double LIGHT = 0.08;
     @Override
     public void loop() {
         //telemetry.addData("Status", "Running: " + runtime.toString());
         telemetry.addData("Resultant", resultant(1,0,0)[0]);
+        telemetry.addData("Runtime", runtime.milliseconds());
         if(!task1){
-            if(Double.parseDouble(runtime.toString())<1.5){
-                driveAngle(Math.PI,1);
+            if(runtime.milliseconds()<800){
+                driveAngle(0,1);
             } else {
-                time = Double.parseDouble(runtime.toString());
-                driveAngle(Math.PI,0);
+                time = runtime.milliseconds();
+                driveAngle(0,0);
                 task1 = true;
             }
         } else if(!task2){
-            if(Double.parseDouble(runtime.toString())<time+shooterTime){
+            if(runtime.milliseconds()<time+shooterTime){
                 shooter.setPower(0.6);
             } else {
                 task2 = true;
                 shooter.setPower(0);
-                time = Double.parseDouble(runtime.toString());
+                time = runtime.milliseconds();
             }
         } else if(!task3){
             flicker.setPosition(0.2);
             task3 = true;
-            time = Double.parseDouble(runtime.toString());
+            time = runtime.milliseconds();
         } else if(!task4){
             flicker.setPosition(0.6);
-            if(Double.parseDouble(runtime.toString())<time+shooterTime){
+            if(runtime.milliseconds()<time+shooterTime){
                 shooter.setPower(0.6);
             } else {
                 task2 = true;
                 shooter.setPower(0);
-                time = Double.parseDouble(runtime.toString());
+                time = runtime.milliseconds();
             }
         }
     }
