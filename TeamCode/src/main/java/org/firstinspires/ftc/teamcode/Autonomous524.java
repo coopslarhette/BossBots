@@ -36,6 +36,7 @@ import android.content.Context;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorManager;
+import android.widget.Toast;
 
 import com.qualcomm.robotcore.eventloop.opmode.*;
 import com.qualcomm.robotcore.hardware.DcMotor;
@@ -46,6 +47,7 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.OutputStreamWriter;
+import java.util.Arrays;
 
 /**
  * y-axis is along the magnetic field. We need to see if that is north or south. We need to manually calculate
@@ -86,6 +88,8 @@ public class Autonomous524 extends MecanumOpMode {
     private DcMotor eightyTwenty;
     private DcMotor sweeper;
 
+
+
     //Phone sensors
     private Sensor magnetometer;
     private Sensor accelerometer;
@@ -123,7 +127,6 @@ public class Autonomous524 extends MecanumOpMode {
     private double[] gprime; //unit vector in the direction of g
     private double[] x; //cross product of y and g
     private double[] y; // unit vector in the direction of bprime
-    private double[] h; //runtime acceleration vector with gravity
     private double[] a; //runtime acceleration vector withOUT gravity
     private double[] s; //runtime displacement vector
     private double[] bcurr; //runtime magnetic field vector (pun!)
@@ -164,7 +167,28 @@ public class Autonomous524 extends MecanumOpMode {
      */
     @Override
     public void init() {
-
+        //x,y,z
+        b = new double[3];
+        g = new double[3];
+        //c = new double[3]; //I don't think we need this
+        a = new double[3];
+        gprime = new double[3];
+        bprime = new double[3];
+        bcurr = new double[3];
+        setxT = new double[3];
+        setyT = new double[3];
+        curxT = new double[3];
+        curyT = new double[3];
+        sx = new double[3];
+        sy = new double[3];
+        crossBcpY = new double[3];
+        crossBcpYPrime = new double[3];
+        bcurrPrime = new double[3];
+        x = new double[3];
+        y = new double[3];
+        s = new double[3];
+        matrixT = new double[3][3];
+        matrixR = new double[3][3];
 
         motor1 = hardwareMap.dcMotor.get("motor1");
         motor1.setDirection(DcMotorSimple.Direction.REVERSE);
@@ -193,29 +217,22 @@ public class Autonomous524 extends MecanumOpMode {
         sensorService.registerListener(this, magnetometer, SensorManager.SENSOR_DELAY_GAME);
         telemetry.addData("Status", "Registered magnetometer");
 
-        //x,y,z
-        b = new double[3];
-        g = new double[3];
-        //c = new double[3]; //I don't think we need this
-        h = new double[3];
-        a = new double[3];
-        gprime = new double[3];
-        bcurr = new double[3];
-        setxT = new double[3];
-        setyT = new double[3];
-        curxT = new double[3];
-        curyT = new double[3];
-        sx = new double[3];
-        sy = new double[3];
-        crossBcpY = new double[3];
-        crossBcpYPrime = new double[3];
-        bprime = new double[3];
-        bcurrPrime = new double[3];
-        x = new double[3];
-        y = new double[3];
-        s = new double[3];
-        matrixT = new double[3][3];
-        matrixR = new double[3][3];
+
+        shooter = hardwareMap.dcMotor.get("shooter");
+
+        ballKeeper = hardwareMap.servo.get("ballKeeper");
+        flicker = hardwareMap.servo.get("flicker");
+        flicker.setPosition(0.55);
+        ballKeeper.setPosition(0.0);
+        telemetry.addData("Status", "Initialized");
+    }
+
+    /*
+     * Code to run REPEATEDLY after the driver hits INIT, but before they hit PLAY
+     */
+    @Override
+    public void init_loop() {
+
         curx = 5;//initialize curx to the initial gamefield x coord in METERS
         cury = 3;//initialize cury to the initial gamefield y coord in METERS
         cuth = 0;//random initial value for cuth, because it is continuously evaluated (I don’t think we need this)
@@ -230,6 +247,7 @@ public class Autonomous524 extends MecanumOpMode {
         b[0] = compassX;
         b[1] = compassY;
         b[2] = compassZ;
+
 
 
         for (int i = 0; i <= 2; i++) {
@@ -270,19 +288,6 @@ public class Autonomous524 extends MecanumOpMode {
             matrixT[i][1] = y[i];
             matrixT[i][2] = gprime[i];
         }
-        shooter = hardwareMap.dcMotor.get("shooter");
-
-        ballKeeper = hardwareMap.servo.get("ballKeeper");
-        flicker = hardwareMap.servo.get("flicker");
-        ballKeeper.setPosition(0.4);
-        telemetry.addData("Status", "Initialized");
-    }
-
-    /*
-     * Code to run REPEATEDLY after the driver hits INIT, but before they hit PLAY
-     */
-    @Override
-    public void init_loop() {
     }
 
     /*
@@ -298,31 +303,64 @@ public class Autonomous524 extends MecanumOpMode {
      */
     private boolean task1=false; //Drive forward
     private boolean task2=false; //Shoot 1 ball
-    private final double shooterTime = 800;
+    private boolean task3=false; //Flipper
+    private boolean task4=false; //Flipper
+    private final double shooterTime = 100;
     private final double LIGHT = 0.08;
     private double time=0;
     @Override
     public void loop() {
-        //telemetry.addData("Status", "Running: " + runtime.toString());
-        telemetry.addData("Resultant", resultant(1,0,0)[0]);
         telemetry.addData("Runtime", runtime.milliseconds());
+
+        telemetry.addData("resultant", Arrays.toString(resultant(0,1,0)));
+        double[] r = resultant(0,1,0);
+        telemetry.addData("curX", curx);
+        telemetry.addData("curY", cury);
+        telemetry.addData("curyT", curyT);
         if(!task1){
-            if(runtime.milliseconds() != 1000){
+            double factor = 0.1;
+            telemetry.addData("task1", task1);
+            if(runtime.milliseconds() < 10000){
+                motor1.setPower(r[0]*factor);
+                motor2.setPower(r[1]*factor);
+                motor3.setPower(r[2]*factor);
+                motor4.setPower(r[3]*factor);
+            } else {
+                task1 = true;
+                motor1.setPower(0);
+                motor2.setPower(0);
+                motor3.setPower(0);
+                motor4.setPower(0);
+            }
+        }
+
+        /*
+        if(!task1){
+            telemetry.addData("task1", task1);
+            if(runtime.milliseconds() < 500){
                 driveAngle(0,0.7);
             } else {
                 task1 = true;
                 driveAngle(0,0);
-                time+=1000;
+                time+=300;
             }
         } else if(!task2){
-            if(runtime.milliseconds() != time+shooterTime){
-                shooter.setPower(1);
+            if(runtime.milliseconds() < time+shooterTime){
+                shooter.setPower(0.8);
             } else {
                 task2 = true;
                 shooter.setPower(0);
                 time+=shooterTime;
             }
-        }
+        } else if(!task3){
+            if(runtime.milliseconds() < time+300){
+                flicker.setPosition(0.22);
+            } else {
+                task3 = true;
+                flicker.setPosition(0.55);
+                time+=300;
+            }
+        } */
     }
 
     /*
@@ -349,14 +387,8 @@ public class Autonomous524 extends MecanumOpMode {
             setyT[i] = sety * matrixT[i][1];
         }
 
-        telemetry.addData("setXT0", setxT[0]);
-        telemetry.addData("setXT1", setxT[1]);
-        telemetry.addData("setXT2", setxT[2]);
-
         setxNorm = Norm(setxT);
         setyNorm = Norm(setyT);
-        telemetry.addData("setXN", setxNorm);
-        telemetry.addData("setYN", setyNorm);
 
         //errors in the robot's state are calculated as (setpoint-current)
         errx = setxNorm - curx;
@@ -379,7 +411,7 @@ public class Autonomous524 extends MecanumOpMode {
         /**set the p and d constants after calibration
          *(how about make a neural network to do machine learning and let the phone figure these out on its own?)
          */
-        px = 1000;
+        px = 100;
         py = 200;
         pt = 500;
         dx = 700;
@@ -427,13 +459,17 @@ public class Autonomous524 extends MecanumOpMode {
 
 
         //assign the vectors
-        double forward[] = {(outx * -1), (outx * 1), (outx * 1), (outx * -1)};
-        double right[] = {(outy * 1), (outy * 1), (outy * -1), (outy * -1)};
-        double ccw[] = {(outh * 1), (outh * 1), (outh * 1), (outh * 1)};
+        //        Power       motor1      motor2      motor3      motor4
+        double[] forward = {(outx * 1), (outx * 1), (outx * 1), (outx * 1)};
+        double[] right = {(outy * 1), (outy * -1), (outy * 1), (outy * -1)};
+        double[] ccw = {(outh * -1), (outh * 1), (outh * 1), (outh * -1)};
 
+        telemetry.addData("forward", Arrays.toString(forward));
+        telemetry.addData("right", Arrays.toString(right));
+        telemetry.addData("ccw", Arrays.toString(ccw));
 
         for (int i = 0; i <= 3; i++) {
-            resultant[i] = forward[i] + right[i] + ccw[i];
+            resultant[i] = (forward[i] + right[i] + ccw[i])/2.1;
         }
 
 
@@ -442,8 +478,7 @@ public class Autonomous524 extends MecanumOpMode {
         lerry = erry;
         lerth = erth;
 
-
-        return resultant;
+        return forward;
 
 
     }
@@ -465,7 +500,9 @@ public class Autonomous524 extends MecanumOpMode {
                 accX = sensorEvent.values[0];
                 accY = sensorEvent.values[1];
                 accZ = sensorEvent.values[2];
-
+                for (int i = 0; i <= 2; i++) {
+                    a[i] = sensorEvent.values[i] - g[i];
+                }
                 break;
             case Sensor.TYPE_MAGNETIC_FIELD:
                 compassX = sensorEvent.values[0];
@@ -474,19 +511,12 @@ public class Autonomous524 extends MecanumOpMode {
 
                 break;
         }
-        // Print out data
-        telemetry.addData("red", color.red());
-        telemetry.addData("blue", color.blue());
-        telemetry.addData("green", color.green());
-        telemetry.addData("light", light.getLightDetected());
 
         // measured accelerations with gravity
 
 
         //removing gravity
-        for (int i = 0; i <= 2; i++) {
-            a[i] = h[i] - g[i];
-        }
+
 
         //integrating twice to get displacement (remember kinematics?)
         for (int i = 0; i <= 2; i++) {
@@ -574,7 +604,6 @@ public class Autonomous524 extends MecanumOpMode {
         if (crossBcpYNorm < crossBcpYPrimeNorm) {
             cuth = (2 * Math.PI) - cuth;
         }
-        telemetry.addData("Resultant",resultant(1,0,0)[0]);
     }
 
 
