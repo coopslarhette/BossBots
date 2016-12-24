@@ -68,6 +68,8 @@ public abstract class MecanumOpMode extends OpMode implements SensorEventListene
     public void driveOneJoystick(int gamepad, String side) {
         boolean slowMode = false;
         double angle, length;
+        double change = 0.02;
+        double limitedLength = 0;
         switch (gamepad) {
             case 1:
                 if (side.equalsIgnoreCase("left")) {
@@ -97,6 +99,15 @@ public abstract class MecanumOpMode extends OpMode implements SensorEventListene
                 }
                 break;
         }
+
+        /**
+         * Fixes start/stop stuttering issues by changing drive power multiple
+         * each loop, starting at 0
+         */
+        if (limitedLength <= length - change) {
+            limitedLength += change;
+        }
+
         /**
          * Slow-mode code
          */
@@ -105,11 +116,11 @@ public abstract class MecanumOpMode extends OpMode implements SensorEventListene
         else if (gamepad1.right_bumper)
             slowMode = false;
         if (slowMode)
-            length = length / 2;
+            limitedLength = limitedLength / 2;
 
         //Calculates the motor power based off of trignometric functions
-        double sin2and4 = length * Math.round(Math.sin(angle - Math.PI / 4) * 10.0) / 10.0;
-        double cos1and3 = length * Math.round(Math.cos(angle - Math.PI / 4) * 10.0) / 10.0;
+        double sin2and4 = limitedLength * Math.round(Math.sin(angle - Math.PI / 4) * 10.0) / 10.0;
+        double cos1and3 = limitedLength * Math.round(Math.cos(angle - Math.PI / 4) * 10.0) / 10.0;
 
         //Driving
         if (Math.abs(gamepad1.right_stick_x) != 0) {

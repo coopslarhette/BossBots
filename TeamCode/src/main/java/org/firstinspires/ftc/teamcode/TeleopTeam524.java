@@ -56,10 +56,10 @@ public class TeleopTeam524 extends MecanumOpMode {
     private DcMotor belt;
     private DcMotor eightyTwenty;
     private DcMotor sweeper;
-    private DcMotor shooter;
+    private DcMotor lexanShooter;
     private Servo ballKeeper;
     private Servo flicker;
-    private Servo liftKeep;
+    private Servo etKeeper;
 
     /*
     *   Motor position
@@ -87,7 +87,7 @@ public class TeleopTeam524 extends MecanumOpMode {
         motor4 = hardwareMap.dcMotor.get("motor4");
         motor4.setDirection(DcMotorSimple.Direction.REVERSE);
 
-        shooter = hardwareMap.dcMotor.get("shooter");
+        lexanShooter = hardwareMap.dcMotor.get("shooter");
         belt = hardwareMap.dcMotor.get("belt");
         belt.setDirection(DcMotorSimple.Direction.REVERSE);
         sweeper = hardwareMap.dcMotor.get("sweeper");
@@ -96,7 +96,7 @@ public class TeleopTeam524 extends MecanumOpMode {
 
         ballKeeper = hardwareMap.servo.get("ballKeeper");
         flicker = hardwareMap.servo.get("flicker");
-        liftKeep = hardwareMap.servo.get("liftKeep");
+        etKeeper = hardwareMap.servo.get("liftKeep");
 
         light = hardwareMap.lightSensor.get("light");
         color = hardwareMap.colorSensor.get("color");
@@ -109,7 +109,7 @@ public class TeleopTeam524 extends MecanumOpMode {
 
         ballKeeper.setPosition(0);
         flicker.setPosition(0.55);
-        liftKeep.setPosition(0);
+        etKeeper.setPosition(0);
     }
 
     /*
@@ -141,24 +141,24 @@ public class TeleopTeam524 extends MecanumOpMode {
 
         /**
          * Sets power of belt, sweeper, and eighty-twenty lift; left bumper or right bumper
-         * reverses sweeper and eight-twenty.
+         * reverses sweeper, belt, and eight-twenty.
          */
-        belt.setPower(gamepad2.left_trigger * etChange());
-        sweeper.setPower(gamepad2.left_trigger * etChange());
-        eightyTwenty.setPower(etChange() * gamepad2.right_trigger);
+        belt.setPower(gamepad2.left_trigger * revDirection());
+        sweeper.setPower(gamepad2.left_trigger * revDirection());
+        eightyTwenty.setPower(revDirection() * gamepad2.right_trigger);
 
         if (gamepad2.x)
-            shooter.setPower(0.5);
+            lexanShooter.setPower(0.5);
         else
-            shooter.setPower(0);
+            lexanShooter.setPower(0);
         if (gamepad2.a)
             flicker.setPosition(0.2);
         else
             flicker.setPosition(0.55);
 
         //Servo for releasing the eighty-twenty
-        if (gamepad2.b)  //(gamepad2.right_stick_button && gamepad2.left_stick_button) || runtime.seconds() >= 90
-            liftKeep.setPosition(0.5);
+        if (gamepad2.b)
+            etKeeper.setPosition(0.5);
     }
 
     /*
@@ -173,7 +173,7 @@ public class TeleopTeam524 extends MecanumOpMode {
      *
      * @return returns either -1 to reverse an a all action motots, or num.
      */
-    public double etChange() {
+    public double revDirection() {
         if (gamepad2.right_bumper || gamepad2.left_bumper) {
             return -0.3;
         } else
