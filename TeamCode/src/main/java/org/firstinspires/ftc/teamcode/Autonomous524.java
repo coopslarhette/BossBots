@@ -132,7 +132,7 @@ public class Autonomous524 extends MecanumOpMode {
     private double[] bcurr; //runtime magnetic field vector (pun!)
     private double[] setxT; //x setpoint in phone coordinate system
     private double[] setyT; //y setpoint in phone coordinate system
-    private double[] curxT; //y current value in phone coordinate system
+    private double[] curxT; //x current value in phone coordinate system
     private double[] curyT; //y current value in phone coordinate system
     private double[] sx; //projection of s[] on curxT
     private double[] sy; //projection of s[] on curyT
