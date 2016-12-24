@@ -66,6 +66,7 @@ public abstract class MecanumOpMode extends OpMode implements SensorEventListene
      * @param side    Which joystick to use: "left" or "right." Default "right"
      */
     public void driveOneJoystick(int gamepad, String side) {
+        boolean slowMode = false;
         double angle, length;
         switch (gamepad) {
             case 1:
@@ -96,9 +97,16 @@ public abstract class MecanumOpMode extends OpMode implements SensorEventListene
                 }
                 break;
         }
-//        if (gamepad1.left_stick_button && gamepad1.right_stick_button) {
-//            length = length / 2;
-//        }
+        /**
+         * Slow-mode code
+         */
+        if (gamepad1.left_bumper)
+            slowMode = true;
+        else if (gamepad1.right_bumper)
+            slowMode = false;
+        if (slowMode)
+            length = length / 2;
+
         //Calculates the motor power based off of trignometric functions
         double sin2and4 = length * Math.round(Math.sin(angle - Math.PI / 4) * 10.0) / 10.0;
         double cos1and3 = length * Math.round(Math.cos(angle - Math.PI / 4) * 10.0) / 10.0;
