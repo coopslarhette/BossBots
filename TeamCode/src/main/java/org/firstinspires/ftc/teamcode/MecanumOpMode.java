@@ -9,12 +9,13 @@ import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.hardware.ColorSensor;
 import com.qualcomm.robotcore.hardware.CompassSensor;
 import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.Gamepad;
 import com.qualcomm.robotcore.hardware.LightSensor;
 import com.qualcomm.robotcore.hardware.Servo;
 
 /**
  * Created by Stone Mao & Cooper LaRhette in the 2016-2017 school year
- * for the Campolindo High School robotics team
+ * for the Campolindo High School robotics team The Boss Bots
  */
 
  /*
@@ -52,6 +53,10 @@ public abstract class MecanumOpMode extends OpMode implements SensorEventListene
     public float accY;
     public float accZ;
 
+    private boolean slowMode = false;
+    double limitedLength = 0; // Power truncation/factor
+    double previousAngle=0;
+
     public void turning() {
         motor1.setPower(-gamepad1.right_stick_x);
         motor2.setPower(gamepad1.right_stick_x);
@@ -65,62 +70,47 @@ public abstract class MecanumOpMode extends OpMode implements SensorEventListene
      * @param gamepad Which gamepad to use: 1 or 2. Default 1
      * @param side    Which joystick to use: "left" or "right." Default "right"
      */
-    public void driveOneJoystick(int gamepad, String side) {
-        boolean slowMode = false;
+    public void driveOneJoystick(Gamepad gamepad, String side) {
         double angle, length;
-        double change = 0.02;
-        double limitedLength = 0;
-        switch (gamepad) {
-            case 1:
-                if (side.equalsIgnoreCase("left")) {
-                    angle = this.getJoystickAngle(gamepad1.left_stick_x, gamepad1.left_stick_y);
-                    length = this.getDistance(gamepad1.left_stick_x, gamepad1.left_stick_y);
-                } else {
-                    angle = this.getJoystickAngle(gamepad1.right_stick_x, gamepad1.left_stick_y);
-                    length = this.getDistance(gamepad1.right_stick_x, gamepad1.left_stick_y);
-                }
-                break;
-            case 2:
-                if (side.equalsIgnoreCase("left")) {
-                    angle = this.getJoystickAngle(gamepad2.left_stick_x, gamepad2.left_stick_y);
-                    length = this.getDistance(gamepad2.left_stick_x, gamepad2.left_stick_y);
-                } else {
-                    angle = this.getJoystickAngle(gamepad2.right_stick_x, gamepad2.left_stick_y);
-                    length = this.getDistance(gamepad2.right_stick_x, gamepad2.left_stick_y);
-                }
-                break;
-            default:
-                if (side.equalsIgnoreCase("left")) {
-                    angle = this.getJoystickAngle(gamepad1.left_stick_x, gamepad1.left_stick_y);
-                    length = this.getDistance(gamepad1.left_stick_x, gamepad1.left_stick_y);
-                } else {
-                    angle = this.getJoystickAngle(gamepad1.right_stick_x, gamepad1.left_stick_y);
-                    length = this.getDistance(gamepad1.right_stick_x, gamepad1.left_stick_y);
-                }
-                break;
+        final double CHANGE = 0.09;
+
+        if (side.equalsIgnoreCase("left")) {
+            angle = this.getJoystickAngle(gamepad.left_stick_x, gamepad.left_stick_y);
+            length = this.getDistance(gamepad.left_stick_x, gamepad.left_stick_y);
+        } else {
+            angle = this.getJoystickAngle(gamepad.right_stick_x, gamepad.left_stick_y);
+            length = this.getDistance(gamepad.right_stick_x, gamepad.left_stick_y);
         }
 
-        /**
-         * Fixes start/stop stuttering issues by changing drive power multiple
-         * each loop, starting at 0
+        /*
+         Acceleration & Deceleration code --> inactive
          */
-        if (limitedLength <= length - change) {
-            limitedLength += change;
-        }
+//        if (limitedLength+CHANGE <= length) { // Player pulls joystick to full extent
+//            limitedLength += CHANGE; // Factor increases to accelerate
+//            previousAngle = angle; // Stores the angle which the robot is accelerating at
+//        } else if (length<=0.2) { // Joystick released to 0,0
+//            if(limitedLength-CHANGE > length){ // Checks to see if it still can decelerate
+//                limitedLength -= CHANGE;
+//            } else {
+//                limitedLength=0;
+//            }
+//            angle = previousAngle; // So it doesn't go right (0 deg) when we joystick is back at 0,0
+//        }
+
 
         /**
          * Slow-mode code
          */
         if (gamepad1.left_bumper)
             slowMode = true;
-        else if (gamepad1.right_bumper)
+        if (gamepad1.right_bumper)
             slowMode = false;
         if (slowMode)
-            limitedLength = limitedLength / 2;
+            limitedLength = limitedLength / 4;
 
         //Calculates the motor power based off of trignometric functions
-        double sin2and4 = limitedLength * Math.round(Math.sin(angle - Math.PI / 4) * 10.0) / 10.0;
-        double cos1and3 = limitedLength * Math.round(Math.cos(angle - Math.PI / 4) * 10.0) / 10.0;
+        double sin2and4 = Math.abs(limitedLength) * Math.round(Math.sin(angle - Math.PI / 4) * 10.0) / 10.0;
+        double cos1and3 = Math.abs(limitedLength) * Math.round(Math.cos(angle - Math.PI / 4) * 10.0) / 10.0;
 
         //Driving
         if (Math.abs(gamepad1.right_stick_x) != 0) {
