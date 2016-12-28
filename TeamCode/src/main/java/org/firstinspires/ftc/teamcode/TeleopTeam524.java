@@ -133,7 +133,7 @@ public class TeleopTeam524 extends MecanumOpMode {
     @Override
     public void loop() {
         telemetry.addData("Status", "Running: " + runtime.toString());
-        driveOneJoystick(1, "left");
+        driveOneJoystick(gamepad1, "left");
         telemetry.addData("x value", gamepad1.left_stick_x);
         telemetry.addData("y value", gamepad1.left_stick_y);
         telemetry.addData("angle", (getJoystickAngle(gamepad1.left_stick_x, gamepad1.left_stick_y)
