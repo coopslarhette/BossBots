@@ -67,8 +67,10 @@ public class NewAutonomous524 extends MecanumOpMode {
     private Servo flicker;
 
     //PID variables
-    private double[] acc, vel, pos, setpos, errpos, output; //acceleration (WITHOUT g), velocity, position, setpoint (position), error in position, output (scaled voltage)
+    private double[] acc, vel, pos, output, setpos; //acceleration (WITHOUT g), velocity, position, output (scaled voltage)
     private double[] kp, kd; //output (scaled voltage)
+    private double[] accl, magn, g, b; //raw accelerometer and magnetometer values, calibration values (gravity, south/north)
+    private long interval; //sensor sample period (1/sample frequency)
 
 
     /*
@@ -88,14 +90,16 @@ public class NewAutonomous524 extends MecanumOpMode {
      */
     @Override
     public void init() {
-        acc = new double[3];
-        vel = new double[3];
-        pos = new double[3];
-        setpos = new double[3];
-        errpos = new double[3];
+        acc = new double[3]; //stores x, y and z accelerations from acc after removing gravity
+        vel = new double[3]; //stores x, y and THETA velocities (from acc and mag)
+        pos = new double[3]; //stores x, y and theta positions (from acc and mag)
         output = new double[3];
+        setpos = new double[3];
 
-        //set initial positions; ask Sagnick for details of what to do
+        //set sample period for sensors
+        interval = ;
+
+        //set initial positions; ask Sagnick for details of what to do (gamepad thingy)
         pos[0] = ;
         pos[1] = ;
         pos[2] = ;
@@ -109,9 +113,7 @@ public class NewAutonomous524 extends MecanumOpMode {
         kd[2] = ;
 
         light = hardwareMap.lightSensor.get("light");
-
         color = hardwareMap.colorSensor.get("color");
-
         teamColor = "r";
 
         //Initialize sensor service
@@ -143,7 +145,27 @@ public class NewAutonomous524 extends MecanumOpMode {
      */
     @Override
     public void init_loop() {
+        //keep measuring the accelerometer and magnetometer until driver hits PLAY
+        //make sure robot is stationary and level
+        //the last value before break is used for calibration
+        if (getRuntime()% == 0){
+            /*
+            *
+            * Code to read the accelerometer and magnetometer goes here
+            * Raw acc values are stored in g[]
+            * Raw magnetometer values are stored in b[]
+            *
+            * */
 
+            /*
+            * Code to average many (~100) g[] values and store in g[] (using +=)
+            * */
+
+            //set this time to 3-4 seconds
+            if (getRuntime() >= ){
+                break
+            }
+        }
     }
 
     /*
@@ -159,20 +181,25 @@ public class NewAutonomous524 extends MecanumOpMode {
      */
     @Override
     public void loop() {
-        //do something about timing
+        if (getRuntime() <= ){
+            setpos[0] = ; //x position
+            setpos[1] = ; //y position
+            setpos[2] = ; //orientation
 
-        //sensor stuff here
+            //should it be <= someNumber instead of ==someNumber? (will the code stop when getRuntime()%interval != 0?)
+            if (getRuntime() % interval == 0){
+            /*
+            *
+            * Code to read the accelerometer and magnetometer goes here
+            * Raw acc values are stored in accl[]
+            * Raw magnetometer values are stored in magn[]
+            *
+            * */
 
-
-
-        //this is the PD controller
-        public double[] output(setpos[0], setpos[1]) {
-            for (int i = 0; i <= 2; i++) {
-                output[i] = (kp[i] * (setpos[i] - pos[i])) - (kd[i] * vel[i]);
             }
-
-            return output; //why is this giving an error?
         }
+
+
     }
 
     /*
@@ -182,4 +209,31 @@ public class NewAutonomous524 extends MecanumOpMode {
     public void stop() {
 
     }
+
+    //this is the PD controller
+    public double[] output(double[] setpos) {
+        for (int i = 0; i <= 2; i++) {
+            output[i] = (kp[i] * (setpos[i] - pos[i])) - (kd[i] * vel[i]);
+        }
+        return output;
+    }
+
+    //use the version below if the one above gets messy
+    /*
+    public double outx(double[] setx){
+        double setX = setx[0];
+        return (kp[0]*(setX - pos[0])) - (kd[0]*vel[0]);
+    }
+
+    public double outy(double[] sety){
+        double setY = sety[1];
+        return (kp[1]*(setY - pos[1])) - (kd[1]*vel[1]);
+    }
+
+    public double outh(double[] seth){
+        double setH = seth[2];
+        return (kp[2]*(setH - pos[2])) - (kd[2]*vel[2]);
+    }
+    */
+
 }
