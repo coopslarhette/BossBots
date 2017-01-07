@@ -70,7 +70,7 @@ import java.util.Arrays;
  * motor 3 gets resultant[2] and motor 4 gets resultant[3].
  **/
 
-
+/**
 
 
   /* forward[] is in the positive x direction, right[] is in the positive y direction, and ccw[] is (obviously) in the counterclockwise
@@ -144,7 +144,7 @@ public class Autonomous524 extends MecanumOpMode {
     double[] resultant = new double[4];
     private String teamColor;
     private int interval = SensorManager.SENSOR_DELAY_GAME; //interval for integration; should be the same as the sample period for the IMU
-    private double calibration = 4.5; //stores the offset between the magnetic y-axis and the gamefield y-axis in RADIANS
+    private double calibration = 1.0; //stores the offset between the magnetic y-axis and the gamefield y-axis in RADIANS
     private DcMotor shooter;
     private Servo ballKeeper;
     private Servo flicker;
