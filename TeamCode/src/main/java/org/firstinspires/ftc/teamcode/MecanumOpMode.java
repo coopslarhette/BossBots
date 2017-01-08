@@ -46,9 +46,9 @@ public abstract class MecanumOpMode extends OpMode implements SensorEventListene
     public ColorSensor color;
 
     public SensorManager sensorService;
-    private float compassX;
-    private float compassY;
-    private float compassZ;
+    public float compassX;
+    public float compassY;
+    public float compassZ;
     public float accX;
     public float accY;
     public float accZ;

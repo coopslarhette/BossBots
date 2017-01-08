@@ -35,6 +35,7 @@ package org.firstinspires.ftc.teamcode;
 import android.content.Context;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
+import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
 
 import com.qualcomm.robotcore.eventloop.opmode.Disabled;
@@ -45,7 +46,7 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 
 import java.util.Arrays;
 
-@com.qualcomm.robotcore.eventloop.opmode.Autonomous (name = "Team 524 Autonomous", group = "Iterative Opmode")
+@com.qualcomm.robotcore.eventloop.opmode.Autonomous(name = "Team 524 Autonomous", group = "Iterative Opmode")
 // @Autonomous(...) is the other common choice
 @Disabled
 public class NewAutonomous524 extends MecanumOpMode {
@@ -56,7 +57,6 @@ public class NewAutonomous524 extends MecanumOpMode {
     private DcMotor sweeper;
 
 
-
     //Phone sensors
     private Sensor magnetometer;
     private Sensor accelerometer;
@@ -65,13 +65,13 @@ public class NewAutonomous524 extends MecanumOpMode {
     private DcMotor shooter;
     private Servo ballKeeper;
     private Servo flicker;
+    private double initAfterRT;
 
     //PID variables
     private double[] acc, vel, pos, output, setpos; //acceleration (WITHOUT g), velocity, position, output (scaled voltage)
     private double[] kp, kd; //output (scaled voltage)
-    private double[] accl, magn, g, b; //raw accelerometer and magnetometer values, calibration values (gravity, south/north)
+    private double[] accl, magn, g, b; //raw accelerometer and magnetometer values, calibration values (gravity, south/north) (NEEDS NEW DOUBLE???)
     private long interval; //sensor sample period (1/sample frequency)
-
 
     /*
     *   Motor position
@@ -84,6 +84,7 @@ public class NewAutonomous524 extends MecanumOpMode {
     *    []-------[]
     *  motor1    motor2
     */
+    private double[] coord = new double[3];
 
     /*
      * Code to run ONCE when the driver hits INIT
@@ -97,20 +98,20 @@ public class NewAutonomous524 extends MecanumOpMode {
         setpos = new double[3];
 
         //set sample period for sensors
-        interval = ;
+        interval = SensorManager.SENSOR_DELAY_GAME;
 
         //set initial positions; ask Sagnick for details of what to do (gamepad thingy)
-        pos[0] = ;
-        pos[1] = ;
-        pos[2] = ;
+        pos[0] =;
+        pos[1] =;
+        pos[2] =;
 
         //set the proportional and derivative constants
-        kp[0] = ;
-        kp[1] = ;
-        kp[2] = ;
-        kd[0] = ;
-        kd[1] = ;
-        kd[2] = ;
+        kp[0] =;
+        kp[1] =;
+        kp[2] =;
+        kd[0] =;
+        kd[1] =;
+        kd[2] =;
 
         light = hardwareMap.lightSensor.get("light");
         color = hardwareMap.colorSensor.get("color");
@@ -138,17 +139,24 @@ public class NewAutonomous524 extends MecanumOpMode {
         flicker.setPosition(0.55);
         ballKeeper.setPosition(0.0);
         telemetry.addData("Status", "Initialized");
+        initAfterRT = runtime.milliseconds();
+
+        coord[0]=0;
+        coord[0]=1;
+        coord[0]=0;
     }
 
     /*
      * Code to run REPEATEDLY after the driver hits INIT, but before they hit PLAY
      */
+    private boolean done = false;
     @Override
     public void init_loop() {
+        int n = 0; //no. of measurements of b[] and g[]
         //keep measuring the accelerometer and magnetometer until driver hits PLAY
         //make sure robot is stationary and level
         //the last value before break is used for calibration
-        if (getRuntime()% == 0){
+
             /*
             *
             * Code to read the accelerometer and magnetometer goes here
@@ -161,11 +169,36 @@ public class NewAutonomous524 extends MecanumOpMode {
             * Code to average many (~100) g[] values and store in g[] (using +=)
             * */
 
-            //set this time to 3-4 seconds
-            if (getRuntime() >= ){
-                break
-            }
+        //set this time to 3-4 seconds
+        if(!done){
+            accl[0] += accX;
+            accl[1] += accY;
+            accl[2] += accZ;
+
+            magn[0] += compassX;
+            magn[1] += compassY;
+            magn[2] += compassZ;
+
+            n++;
         }
+        if (getRuntime() >= initAfterRT + 3000 && !done) {
+            accl[0] = accl[0] / n;
+            accl[1] = accl[1] / n;
+            accl[2] = accl[2] / n;
+            magn[0] = magn[0] / n;
+            magn[1] = magn[1] / n;
+            magn[2] = magn[2] / n;
+                /*
+                * Telemetry to display "calibration done"
+                * */
+
+            g = unitVector(accl);
+            b = unitVector(magn);
+
+            done = true;
+        }
+
+
     }
 
     /*
@@ -179,27 +212,20 @@ public class NewAutonomous524 extends MecanumOpMode {
     /*
      * Code to run REPEATEDLY after the driver hits PLAY but before they hit STOP
      */
+    private boolean task1, task2, task3;
+
     @Override
     public void loop() {
-        if (getRuntime() <= ){
-            setpos[0] = ; //x position
-            setpos[1] = ; //y position
-            setpos[2] = ; //orientation
 
-            //should it be <= someNumber instead of ==someNumber? (will the code stop when getRuntime()%interval != 0?)
-            if (getRuntime() % interval == 0){
-            /*
-            *
-            * Code to read the accelerometer and magnetometer goes here
-            * Raw acc values are stored in accl[]
-            * Raw magnetometer values are stored in magn[]
-            *
-            * */
-
+        if (!task1 )  {
+            // if it gets to that position
+            if(goToPosition(coord)){
+                //set new coord
+                coord[0] = ;
+                coord[0] = ;
+                coord[0] = ;
             }
         }
-
-
     }
 
     /*
@@ -218,6 +244,53 @@ public class NewAutonomous524 extends MecanumOpMode {
         return output;
     }
 
+    public boolean goToPosition(double[] setpoint){
+        setpos[0] = setpoint[0]; //x position
+        setpos[1] = setpoint[1]; //y position
+        setpos[2] = setpoint[2]; //orientation
+
+        //should it be <= someNumber instead of ==someNumber? (will the code stop when getRuntime()%interval != 0?)
+        if (runtime.milliseconds() % interval <= 19) {
+            /*
+            *
+            * Code to read the accelerometer and magnetometer goes here
+            * Raw acc values are stored in accl[]
+            * Raw magnetometer values are stored in magn[]
+            *
+            * */
+
+            accl[0] = accX;
+            accl[1] = accY;
+            accl[2] = accZ;
+
+            magn[0] = compassX;
+            magn[1] = compassY;
+            magn[2] = compassZ;
+
+            for (int i; i <= 2; i++){
+                acc[i] = accl[i] - g[i];
+            }
+
+            for (int i; i <== 2; i++){
+                vel[i] += ;
+            }
+
+            //ONLY A PLACEHOLDER
+            double[] o = output(setpos);
+            motor1.setPower(o[0]);
+        }
+        if(threshold(setpos[0],pos[0]) && threshold(setpos[1],pos[1]) && threshold(setpos[2],pos[2])){
+            return true;
+        }
+        return false;
+    }
+    public boolean threshold(double one, double two){
+        final double THRESHOLD = 0.1;
+        if(Math.abs(one-two) < THRESHOLD){
+            return true;
+        }
+        return false;
+    }
     //use the version below if the one above gets messy
     /*
     public double outx(double[] setx){
@@ -235,5 +308,42 @@ public class NewAutonomous524 extends MecanumOpMode {
         return (kp[2]*(setH - pos[2])) - (kd[2]*vel[2]);
     }
     */
+    public void onSensorChanged(SensorEvent sensorEvent) {
+        switch (sensorEvent.sensor.getType()) {
+            case Sensor.TYPE_ACCELEROMETER:
+                accX = sensorEvent.values[0];
+                accY = sensorEvent.values[1];
+                accZ = sensorEvent.values[2];
+                break;
+            case Sensor.TYPE_MAGNETIC_FIELD:
+                compassX = sensorEvent.values[0];
+                compassY = sensorEvent.values[1];
+                compassZ = sensorEvent.values[2];
+                break;
+        }
+    }
 
+    public double dotProduct(double[] vector1, double[] vector2){
+        return (vector1[0]*vector2[0]) + (vector1[1]*vector2[1]) + (vector1[2]*vector2[2]);
+    }
+
+    public double[] crossProduct(double[] vector1, double[] vector2){
+        double[] cp = new double[3];
+
+        cp[0] = (vector1[1]*vector2[2]) - (vector1[2]*vector2[1]);
+        cp[1] = (vector1[2]*vector2[0]) - (vector1[0]*vector2[2]);
+        cp[2] = (vector1[0]*vector2[1]) - (vector1[1]*vector2[0]);
+
+        return cp;
+    }
+
+    public double[] unitVector(double[] vector1){
+        double[] uv = new double[3];
+
+        for (int i = 0; i <=2; i++){
+            uv[i] = vector1[i]/dotProduct(vector1, vector1);
+        }
+
+        return uv;
+    }
 }
