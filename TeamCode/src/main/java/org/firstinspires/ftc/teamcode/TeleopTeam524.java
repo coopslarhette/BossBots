@@ -157,7 +157,7 @@ public class TeleopTeam524 extends MecanumOpMode {
             flicker.setPosition(0.55);
 
         //Servo for releasing the eighty-twenty
-        if (gamepad2.b)
+        if (gamepad2.y)
             etKeeper.setPosition(0.5);
     }
 
