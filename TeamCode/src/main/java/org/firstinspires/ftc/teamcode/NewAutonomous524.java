@@ -41,9 +41,11 @@ import android.hardware.SensorManager;
 import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
+import com.qualcomm.robotcore.hardware.GyroSensor;
 import com.qualcomm.robotcore.hardware.Servo;
+import com.qualcomm.robotcore.hardware.AccelerationSensor;
 import com.qualcomm.robotcore.util.ElapsedTime;
-
+import
 import java.util.Arrays;
 
 @com.qualcomm.robotcore.eventloop.opmode.Autonomous(name = "Team 524 Autonomous", group = "Iterative Opmode")
@@ -63,6 +65,8 @@ public class NewAutonomous524 extends MecanumOpMode {
 
     private String teamColor;
     private DcMotor shooter;
+    private AccelerationSensor accelNXT;
+    private GyroSensor gyroNXT;
     private Servo ballKeeper;
     private Servo flicker;
     private double initAfterRT;
@@ -71,6 +75,9 @@ public class NewAutonomous524 extends MecanumOpMode {
     private double[] acc, vel, pos, output, setpos; //acceleration (WITHOUT g), velocity, position, output (scaled voltage)
     private double[] kp, kd; //output (scaled voltage)
     private double[] accl, magn, g, b; //raw accelerometer and magnetometer values, calibration values (gravity, south/north) (NEEDS NEW DOUBLE???)
+    private double[] velo, posi;
+    private double[] angvel, angpos;
+
     private long interval; //sensor sample period (1/sample frequency)
 
     /*
@@ -86,6 +93,9 @@ public class NewAutonomous524 extends MecanumOpMode {
     */
     private double[] coord = new double[3];
 
+    public NewAutonomous524() {
+    }
+
     /*
      * Code to run ONCE when the driver hits INIT
      */
@@ -93,9 +103,17 @@ public class NewAutonomous524 extends MecanumOpMode {
     public void init() {
         acc = new double[3]; //stores x, y and z accelerations from acc after removing gravity
         vel = new double[3]; //stores x, y and THETA velocities (from acc and mag)
+        angvel = new double[3]; //stores x, y and THETA velocities (from acc and mag)
         pos = new double[3]; //stores x, y and theta positions (from acc and mag)
+        angpos = new double[3]; //stores x, y and theta positions (from acc and mag)
         output = new double[3];
         setpos = new double[3];
+        magn = new double[3];
+        accl = new double[3];
+        g = new double[3];
+        b = new double[3];
+        velo = new double[3];
+        posi = new double[3];
 
         //set sample period for sensors
         interval = SensorManager.SENSOR_DELAY_GAME;
@@ -130,7 +148,9 @@ public class NewAutonomous524 extends MecanumOpMode {
         telemetry.addData("Status", "Registered acclerometer");
         sensorService.registerListener(this, magnetometer, SensorManager.SENSOR_DELAY_GAME);
         telemetry.addData("Status", "Registered magnetometer");
-
+        //NXT
+        accelNXT = hardwareMap.accelerationSensor.get("acc");
+        gyroNXT = hardwareMap.gyroSensor.get("gyro");
 
         shooter = hardwareMap.dcMotor.get("shooter");
 
@@ -181,6 +201,9 @@ public class NewAutonomous524 extends MecanumOpMode {
 
             n++;
         }
+        /*
+        THIS PART LOOKS SKETCHY (look carefully at the !done statements)
+        */
         if (getRuntime() >= initAfterRT + 3000 && !done) {
             accl[0] = accl[0] / n;
             accl[1] = accl[1] / n;
@@ -263,17 +286,18 @@ public class NewAutonomous524 extends MecanumOpMode {
             accl[1] = accY;
             accl[2] = accZ;
 
-            magn[0] = compassX;
-            magn[1] = compassY;
-            magn[2] = compassZ;
+            angvel[0] = gyroX;
+            angvel[1] = gyroY;
+            angvel[2] = gyroZ;
 
-            for (int i; i <= 2; i++){
+            for (int i = 0; i <= 2; i++){
                 acc[i] = accl[i] - g[i];
+                velo[i] += acc[i]*interval;
+                posi[i] += 0.5*acc[i]*interval*interval;
+                angpos[i] += angvel[i]*interval;
             }
 
-            for (int i; i <== 2; i++){
-                vel[i] += ;
-            }
+            Matrix a = new Matrix(3,5);
 
             //ONLY A PLACEHOLDER
             double[] o = output(setpos);
@@ -311,15 +335,18 @@ public class NewAutonomous524 extends MecanumOpMode {
     public void onSensorChanged(SensorEvent sensorEvent) {
         switch (sensorEvent.sensor.getType()) {
             case Sensor.TYPE_ACCELEROMETER:
-                accX = sensorEvent.values[0];
-                accY = sensorEvent.values[1];
-                accZ = sensorEvent.values[2];
+                accX = accelNXT.getAcceleration().xAccel;
+                accY = accelNXT.getAcceleration().yAccel;
+                accZ = accelNXT.getAcceleration().zAccel;
+                gyroX = gyroNXT.rawX();
+                gyroY = gyroNXT.rawY();
+                gyroZ = gyroNXT.rawZ();
                 break;
-            case Sensor.TYPE_MAGNETIC_FIELD:
+           /* case Sensor.TYPE_MAGNETIC_FIELD:
                 compassX = sensorEvent.values[0];
                 compassY = sensorEvent.values[1];
                 compassZ = sensorEvent.values[2];
-                break;
+                break;*/
         }
     }
 

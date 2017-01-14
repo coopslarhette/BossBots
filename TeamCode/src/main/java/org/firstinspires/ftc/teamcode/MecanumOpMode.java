@@ -49,9 +49,12 @@ public abstract class MecanumOpMode extends OpMode implements SensorEventListene
     public float compassX;
     public float compassY;
     public float compassZ;
-    public float accX;
-    public float accY;
-    public float accZ;
+    public double accX;
+    public double accY;
+    public double accZ;
+    public double gyroX;
+    public double gyroY;
+    public double gyroZ;
 
     private boolean slowMode = false;
     //    final double CHANGE = 0.09; //rate of change, used in accl
