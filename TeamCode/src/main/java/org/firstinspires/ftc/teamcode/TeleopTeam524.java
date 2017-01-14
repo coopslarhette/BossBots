@@ -97,9 +97,6 @@ public class TeleopTeam524 extends MecanumOpMode {
         ballKeeper = hardwareMap.servo.get("ballKeeper");
         flicker = hardwareMap.servo.get("flicker");
         etKeeper = hardwareMap.servo.get("liftKeep");
-
-        light = hardwareMap.lightSensor.get("light");
-        color = hardwareMap.colorSensor.get("color");
         teamColor = "r";
 
         sensorService = (SensorManager) hardwareMap.appContext.getSystemService(Context.SENSOR_SERVICE);
