@@ -15,6 +15,8 @@ import com.qualcomm.robotcore.hardware.GyroSensor;
 import com.qualcomm.robotcore.hardware.LightSensor;
 import com.qualcomm.robotcore.hardware.Servo;
 
+import org.firstinspires.ftc.robotcore.external.navigation.Acceleration;
+
 /**
  * Created by Stone Mao & Cooper LaRhette in the 2016-2017 school year
  * for the Campolindo High School robotics team The Boss Bots
@@ -44,12 +46,15 @@ public abstract class MecanumOpMode extends OpMode implements SensorEventListene
     public SensorManager sensorService;
     public AccelerationSensor accSense;
     public GyroSensor gyroSense;
+
     public double accX;
     public double accY;
     public double accZ;
+
     public double gyroX;
     public double gyroY;
     public double gyroZ;
+
 
     private boolean slowMode = false;
     //    final double CHANGE = 0.09; //rate of change, used in accl
@@ -173,12 +178,20 @@ public abstract class MecanumOpMode extends OpMode implements SensorEventListene
     }
     @Override
     public void onSensorChanged(SensorEvent sensorEvent) {
-        switch (sensorEvent.sensor.getType()) {
-            case Sensor.TYPE_ACCELEROMETER:
-                accX = sensorEvent.values[0];
-                accY = sensorEvent.values[1];
-                accZ = sensorEvent.values[2];
-                break;
-        }
+//        switch (sensorEvent.sensor.getType()) {
+//            case Sensor.TYPE_ACCELEROMETER:
+//                accX = sensorEvent.values[0];
+//                accY = sensorEvent.values[1];
+//                accZ = sensorEvent.values[2];
+//                break;
+//        }
+        Acceleration a = accSense.getAcceleration();
+        accX = a.xAccel;
+        accY = a.yAccel;
+        accZ = a.zAccel;
+
+        gyroX = gyroSense.rawX();
+        gyroY = gyroSense.rawY();
+        gyroZ = gyroSense.rawZ();
     }
 }
