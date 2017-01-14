@@ -44,7 +44,7 @@ public abstract class MecanumOpMode extends OpMode implements SensorEventListene
     private final double deviation = 0.1;
 
     public ColorSensor color;
-
+    
     public SensorManager sensorService;
     public float compassX;
     public float compassY;
@@ -180,7 +180,7 @@ public abstract class MecanumOpMode extends OpMode implements SensorEventListene
         if (!slowMode)
             return length;
         else
-            return length = length / 3;
+            return length = length / 2;
     }
 
 
