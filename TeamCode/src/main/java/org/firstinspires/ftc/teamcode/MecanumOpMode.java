@@ -6,10 +6,12 @@ import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
 
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
+import com.qualcomm.robotcore.hardware.AccelerationSensor;
 import com.qualcomm.robotcore.hardware.ColorSensor;
 import com.qualcomm.robotcore.hardware.CompassSensor;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.Gamepad;
+import com.qualcomm.robotcore.hardware.GyroSensor;
 import com.qualcomm.robotcore.hardware.LightSensor;
 import com.qualcomm.robotcore.hardware.Servo;
 
@@ -38,17 +40,10 @@ public abstract class MecanumOpMode extends OpMode implements SensorEventListene
     public DcMotor motor4;
 
     public String teamColor;
-
-    public LightSensor light;
-    private final double whiteLight = 0.1;
-    private final double deviation = 0.1;
-
-    public ColorSensor color;
     
     public SensorManager sensorService;
-    public float compassX;
-    public float compassY;
-    public float compassZ;
+    public AccelerationSensor accSense;
+    public GyroSensor gyroSense;
     public double accX;
     public double accY;
     public double accZ;
@@ -80,8 +75,8 @@ public abstract class MecanumOpMode extends OpMode implements SensorEventListene
             angle = this.getJoystickAngle(gamepad.left_stick_x, gamepad.left_stick_y);
             length = this.getDistance(gamepad.left_stick_x, gamepad.left_stick_y);
         } else {
-            angle = this.getJoystickAngle(gamepad.right_stick_x, gamepad.left_stick_y);
-            length = this.getDistance(gamepad.right_stick_x, gamepad.left_stick_y);
+            angle = this.getJoystickAngle(gamepad.right_stick_x, gamepad.right_stick_y);
+            length = this.getDistance(gamepad.right_stick_x, gamepad.right_stick_y);
         }
 
         /**
@@ -106,7 +101,7 @@ public abstract class MecanumOpMode extends OpMode implements SensorEventListene
         double cos1and3 = Math.abs(getLength()) * Math.round(Math.cos(angle - Math.PI / 4) * 10.0) / 10.0;
 
         //Driving
-        if (Math.abs(gamepad1.right_stick_x) != 0) {
+        if (Math.abs(gamepad.right_stick_x) != 0) {
             turning();
         } else {
             motor1.setPower(cos1and3);
@@ -129,8 +124,6 @@ public abstract class MecanumOpMode extends OpMode implements SensorEventListene
         motor4.setPower(sin2and4);
     }
 
-    public void turn(int angle) {
-    }
 
     /**
      * Calculate the angle which the joystick is currently at
@@ -158,15 +151,6 @@ public abstract class MecanumOpMode extends OpMode implements SensorEventListene
         return Math.sqrt(Math.pow(x, 2) + Math.pow(y, 2));
     }
 
-    public void lineTracking() {
-        while (light.getLightDetected() <= whiteLight + deviation && light.getLightDetected() >= whiteLight - deviation) {
-            //Forward method
-        }
-        turn(90);
-        //Forward method
-        //Move right of the beacon
-    }
-
     /**
      * method may modify length to be smaller if slowMode is toggled on by left bumper
      *
@@ -186,13 +170,15 @@ public abstract class MecanumOpMode extends OpMode implements SensorEventListene
 
     public void onAccuracyChanged(Sensor sensor, int accuracy) {
         // Ignoring this for now
-
     }
-
     @Override
     public void onSensorChanged(SensorEvent sensorEvent) {
-        compassX = sensorEvent.values[0];
-        compassY = sensorEvent.values[1];
-        compassZ = sensorEvent.values[2];
+        switch (sensorEvent.sensor.getType()) {
+            case Sensor.TYPE_ACCELEROMETER:
+                accX = sensorEvent.values[0];
+                accY = sensorEvent.values[1];
+                accZ = sensorEvent.values[2];
+                break;
+        }
     }
 }
