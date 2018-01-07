@@ -2,9 +2,9 @@ This is a repository that the Campolindo robotics team (#524) used for part of t
 competition. 
 
 
-* See /TeamCode/src/main/java/org/firstinspires/ftc/teamcode/ for the code that we actually wrote to power
-our robot. We moved over to a new [repo](https://github.com/stonemao9/BossBots) pretty late in the year due to a bad 
-commit that we didn't know how to fix at the time. 
+* See the TeamCode [module](https://github.com/coopslarhette1/BossBots/tree/master/TeamCode/src/main/java/org/firstinspires/ftc/teamcode) 
+for the code that we actually wrote to powerour robot. We moved over to a new [repo](https://github.com/stonemao9/BossBots)
+ pretty late in the year due to a bad commit that we didn't know how to fix at the time. 
 
 * We believe that the most innovative part of our code design was our 
 MecanumOpMode which powered our drive terrain and a somewhat theorized, somewhat implemented PID system which enabled/would have enabled
