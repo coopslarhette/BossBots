@@ -3,11 +3,11 @@ competition.
 
 
 * See the TeamCode [module](https://github.com/coopslarhette1/BossBots/tree/master/TeamCode/src/main/java/org/firstinspires/ftc/teamcode) 
-for the code that we actually wrote to powerour robot. We moved over to a new [repo](https://github.com/stonemao9/BossBots)
+for the code that we actually wrote to power our robot. We moved over to a new [repo](https://github.com/stonemao9/BossBots)
  pretty late in the year due to a bad commit that we didn't know how to fix at the time. 
 
 * We believe that the most innovative part of our code design was our 
-MecanumOpMode which powered our drive terrain and a somewhat theorized, somewhat implemented PID system which enabled/would have enabled
+MecanumOpMode which powered our drive-terrain and a somewhat theorized, somewhat implemented PID system which enabled/would have enabled
 us to have a highly programmable and highly scablable autonomous system. MecanumOpMode was based on the output of plugging
 in the (slightly manipulated) angle of our joystick to a sine or cosine fuction and then mupltiplying that by the distance 
 the joystick was from the center to get drive direction and power. This enabled us to have a robot that could move in virutally
