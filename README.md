@@ -11,7 +11,7 @@ MecanumOpMode which powered our drive-terrain and a somewhat theorized, somewhat
 us to have a highly programmable and highly scablable autonomous system. MecanumOpMode was based on the output of plugging
 in the (slightly manipulated) angle of our joystick to a sine or cosine fuction and then mupltiplying that by the distance 
 the joystick was from the center to get drive direction and power. This enabled us to have a robot that could move in virutally
-any direction without changing direction. PID was a system that was desgined to solve that autonomous part of the challenge.
+any direction without changing orientation. PID was a system that was desgined to solve that autonomous part of the challenge.
 The brilliance of it was that it would allow us to tell the robot where to go in the arena with a high level of precision.
 Unfortunately it was never completed within the '16-17' season, but will be further developed for, and in, the '17-'18 
 season.
